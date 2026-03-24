@@ -4,10 +4,12 @@ import {
 	type ExtrasOptions,
 	type PicoCAD2ViewerState
 } from 'picocad2-web';
+import { DEFAULT_SETTINGS, DEFAULT_EXTRAS } from './constants';
 
-export class Viewer {
-	settings = $state<ViewerSettings>();
-	extras = $state<Required<ExtrasOptions>>();
+class Viewer {
+	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
+	extras = $state<Required<ExtrasOptions>>({ ...DEFAULT_EXTRAS });
+
 	pico!: PicoCAD2Viewer;
 
 	init(canvas: HTMLCanvasElement) {
@@ -41,3 +43,5 @@ export class Viewer {
 		this.extras = state.extras;
 	}
 }
+
+export const viewer = new Viewer();
