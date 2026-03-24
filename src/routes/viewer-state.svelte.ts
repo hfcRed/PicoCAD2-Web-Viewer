@@ -4,7 +4,7 @@ import {
 	type ExtrasOptions,
 	type PicoCAD2ViewerState
 } from 'picocad2-web';
-import { DEFAULT_SETTINGS, DEFAULT_EXTRAS } from './constants';
+import { DEFAULT_SETTINGS, DEFAULT_EXTRAS, CAMERA_LIMITS } from './constants';
 
 class Viewer {
 	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
@@ -28,6 +28,21 @@ class Viewer {
 
 		this.pico.startRenderLoop();
 		this.pico.enableCameraControls();
+
+		this.pico.onFrame = () => {
+			const { rotation, tilt, distance } = CAMERA_LIMITS;
+
+			this.settings.camera = {
+				omega: ((this.pico.camera.omega % rotation.max) + rotation.max) % rotation.max,
+				theta: Math.max(tilt.min, Math.min(tilt.max, this.pico.camera.theta)),
+				distanceToTarget: Math.max(
+					distance.min,
+					Math.min(distance.max, this.pico.camera.distanceToTarget)
+				),
+				target: [...this.pico.camera.target] as [number, number, number],
+				zoom: this.pico.camera.zoom
+			};
+		};
 
 		this.updateState();
 	}
