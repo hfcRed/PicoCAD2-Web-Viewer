@@ -1,6 +1,10 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
 
+	import '../styles/normalize.css';
+	import '../styles/pico.css';
+	import '../styles/global.css';
+
 	let { children } = $props();
 </script>
 
