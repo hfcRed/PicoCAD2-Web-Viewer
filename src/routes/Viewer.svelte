@@ -105,14 +105,16 @@
 	}
 
 	.canvas-container {
+		padding-top: 2rem;
 		position: sticky;
-		top: 2rem;
+		top: 0;
 		left: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
 		width: 100%;
 		aspect-ratio: 1 / 1;
+		z-index: 10;
 
 		canvas {
 			border: var(--pico-border-width) solid var(--pico-form-element-border-color);
