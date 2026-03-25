@@ -4,6 +4,7 @@
 	import { viewer } from './viewer-state.svelte';
 	import { model } from './model';
 	import Camera from './Camera.svelte';
+	import Settings from './Settings.svelte';
 
 	let viewportCanvas: HTMLCanvasElement;
 
@@ -78,11 +79,8 @@
 		<Tabs.Content value="camera">
 			<Camera />
 		</Tabs.Content>
-		<Tabs.Content value="camera">
-			<!-- <Camera /> -->
-		</Tabs.Content>
 		<Tabs.Content value="settings">
-			<!-- <Settings /> -->
+			<Settings />
 		</Tabs.Content>
 		<Tabs.Content value="extras">
 			<!-- <Extras /> -->

@@ -10,25 +10,25 @@
 	<legend>
 		<h3>Camera Settings</h3>
 	</legend>
-	<label>
-		Projection Mode
-		<select
-			bind:value={
-				() => viewer.settings.projectionMode,
-				(v) => viewer.update((pico) => (pico.projectionMode = v))
-			}
-		>
-			<option value="perspective">Perspective</option>
-			<option value="orthographic">Orthographic</option>
-			<option value="fisheye">Fisheye</option>
-		</select>
-	</label>
 	<fieldset>
 		<legend>
 			<h4>Camera Mode</h4>
 		</legend>
 		<label>
-			Mode
+			Projection Mode
+			<select
+				bind:value={
+					() => viewer.settings.projectionMode,
+					(v) => viewer.update((pico) => (pico.projectionMode = v))
+				}
+			>
+				<option value="perspective">Perspective</option>
+				<option value="orthographic">Orthographic</option>
+				<option value="fisheye">Fisheye</option>
+			</select>
+		</label>
+		<label>
+			Movement Mode
 			<select
 				bind:value={
 					() => viewer.settings.cameraMode, (v) => viewer.update((pico) => (pico.cameraMode = v))
@@ -41,7 +41,7 @@
 			</select>
 		</label>
 		<label>
-			Direction
+			Movement Direction
 			<select
 				bind:value={
 					() => viewer.settings.cameraModeDirection,
@@ -54,9 +54,9 @@
 		</label>
 		<NumericControl
 			disabled={disableSpeed}
-			label="Speed"
-			min={0}
-			max={10}
+			label="Movement Speed"
+			min={0.01}
+			max={20}
 			step={0.01}
 			bind:value={
 				() => viewer.settings.cameraModeSpeed,
@@ -69,43 +69,44 @@
 			>
 		{/if}
 	</fieldset>
-</fieldset>
-<hr />
-<fieldset>
-	<legend>
-		<h3>Camera Values</h3>
-	</legend>
-	<NumericControl
-		label="Distance"
-		min={CAMERA_LIMITS.distance.min}
-		max={CAMERA_LIMITS.distance.max}
-		step={0.01}
-		bind:value={
-			() => viewer.settings.camera.distanceToTarget,
-			(v) => viewer.update((pico) => (pico.camera.distanceToTarget = v))
-		}
-	/>
-	<NumericControl
-		label="Tilt"
-		min={CAMERA_LIMITS.tilt.min}
-		max={CAMERA_LIMITS.tilt.max}
-		step={0.01}
-		bind:value={
-			() => viewer.settings.camera.theta, (v) => viewer.update((pico) => (pico.camera.theta = v))
-		}
-	/>
-	<NumericControl
-		label="Rotation"
-		min={CAMERA_LIMITS.rotation.min}
-		max={CAMERA_LIMITS.rotation.max}
-		step={0.01}
-		bind:value={
-			() => viewer.settings.camera.omega, (v) => viewer.update((pico) => (pico.camera.omega = v))
-		}
-	/>
+	<hr />
 	<fieldset>
 		<legend>
-			<h4>Target</h4>
+			<h4>Camera Values</h4>
+		</legend>
+		<NumericControl
+			label="Distance"
+			min={CAMERA_LIMITS.distance.min}
+			max={CAMERA_LIMITS.distance.max}
+			step={0.01}
+			bind:value={
+				() => viewer.settings.camera.distanceToTarget,
+				(v) => viewer.update((pico) => (pico.camera.distanceToTarget = v))
+			}
+		/>
+		<NumericControl
+			label="Tilt"
+			min={CAMERA_LIMITS.tilt.min}
+			max={CAMERA_LIMITS.tilt.max}
+			step={0.01}
+			bind:value={
+				() => viewer.settings.camera.theta, (v) => viewer.update((pico) => (pico.camera.theta = v))
+			}
+		/>
+		<NumericControl
+			label="Rotation"
+			min={CAMERA_LIMITS.rotation.min}
+			max={CAMERA_LIMITS.rotation.max}
+			step={0.01}
+			bind:value={
+				() => viewer.settings.camera.omega, (v) => viewer.update((pico) => (pico.camera.omega = v))
+			}
+		/>
+	</fieldset>
+	<hr />
+	<fieldset>
+		<legend>
+			<h4>Camera Target</h4>
 		</legend>
 		<NumericControl
 			label="X"

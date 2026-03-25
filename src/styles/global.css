@@ -56,6 +56,10 @@ object {
 	max-width: 100%;
 }
 
+fieldset legend {
+	margin-bottom: 0;
+}
+
 .scrollbar,
 textarea {
 	@supports not selector(::-webkit-scrollbar) {
@@ -80,4 +84,32 @@ textarea {
 	&::-webkit-scrollbar-corner {
 		background-color: transparent;
 	}
+}
+
+.form-margin {
+	margin-bottom: var(--pico-spacing);
+}
+
+.form-collapse {
+	width: 100% !important;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	user-select: none;
+
+	&:has(input[type='checkbox']:checked) {
+		margin-bottom: var(--pico-spacing);
+	}
+
+	& h2,
+	h3,
+	h4,
+	input {
+		margin: 0;
+	}
+}
+
+legend:has(.form-collapse) {
+	width: 100%;
 }

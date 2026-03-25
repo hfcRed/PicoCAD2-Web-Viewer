@@ -23,7 +23,7 @@ class Viewer {
 		if (state) {
 			this.pico.setState(state);
 		} else {
-			this.pico.load(model);
+			this.pico.load(model, true);
 		}
 
 		this.pico.startRenderLoop();
@@ -32,6 +32,7 @@ class Viewer {
 		this.pico.onFrame = () => {
 			const { rotation, tilt, distance } = CAMERA_LIMITS;
 
+			this.settings.animation.time = this.pico.animation.time;
 			this.settings.camera = {
 				omega: ((this.pico.camera.omega % rotation.max) + rotation.max) % rotation.max,
 				theta: Math.max(tilt.min, Math.min(tilt.max, this.pico.camera.theta)),
