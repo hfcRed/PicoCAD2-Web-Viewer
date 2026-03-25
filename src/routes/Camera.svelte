@@ -2,6 +2,8 @@
 	import { viewer } from './viewer-state.svelte';
 	import { CAMERA_LIMITS } from './constants';
 	import NumericControl from '$lib/components/NumericControl.svelte';
+
+	let disableSpeed = $derived(viewer.settings.animation.playing);
 </script>
 
 <fieldset>
@@ -51,6 +53,7 @@
 			</select>
 		</label>
 		<NumericControl
+			disabled={disableSpeed}
 			label="Speed"
 			min={0}
 			max={10}
@@ -60,6 +63,11 @@
 				(v) => viewer.update((pico) => (pico.cameraModeSpeed = v))
 			}
 		/>
+		{#if disableSpeed}
+			<small class="disabledSpeed"
+				>When animation is enabled, speed is synchronized with animation time</small
+			>
+		{/if}
 	</fieldset>
 </fieldset>
 <hr />
@@ -131,3 +139,13 @@
 		/>
 	</fieldset>
 </fieldset>
+
+<style>
+	.disabledSpeed {
+		display: block;
+		width: 100%;
+		margin-top: calc(var(--pico-spacing) * -0.75);
+		margin-bottom: var(--pico-spacing);
+		color: var(--pico-muted-color);
+	}
+</style>

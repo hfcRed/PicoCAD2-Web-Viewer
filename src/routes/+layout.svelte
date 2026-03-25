@@ -12,4 +12,4 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{@render children()}
+<main class="container">{@render children()}</main>

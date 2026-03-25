@@ -7,10 +7,11 @@
 		min: number;
 		max: number;
 		step: number;
+		disabled?: boolean;
 		oninput?: FormEventHandler<HTMLInputElement>;
 	}
 
-	let { label, min, max, step, value = $bindable(), oninput }: Props = $props();
+	let { label, min, max, step, disabled, value = $bindable(), oninput }: Props = $props();
 
 	function updateValue(v: number) {
 		if (v === null) return v;
@@ -21,7 +22,7 @@
 <div>
 	<label>
 		{label}
-		<input type="range" {min} {max} {step} bind:value {oninput} />
+		<input type="range" {min} {max} {step} bind:value {oninput} {disabled} />
 	</label>
 	<input
 		type="number"
@@ -29,6 +30,7 @@
 		{max}
 		{step}
 		{oninput}
+		{disabled}
 		bind:value={() => value, (v) => (value = updateValue(v))}
 	/>
 </div>
