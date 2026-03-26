@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Tabs } from 'bits-ui';
 	import { viewer } from './viewer-state.svelte';
-	import { model } from './model';
 	import Camera from './Camera.svelte';
 	import Settings from './Settings.svelte';
 	import Extras from './Extras.svelte';
+	import Models from './Models.svelte';
 
 	let viewportCanvas: HTMLCanvasElement;
 
@@ -12,7 +12,6 @@
 
 	function attachViewer(e: HTMLCanvasElement) {
 		viewer.init(e);
-		viewer.loadModel(JSON.stringify(model));
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
@@ -41,30 +40,28 @@
 		reader.onload = (event) => {
 			const content = event.target?.result;
 			if (typeof content === 'string') {
-				viewer.loadModel(content);
+				viewer.loadModel({ model: content });
 			}
 		};
 		reader.readAsText(file);
 	}
 
 	function handlePaste(e: ClipboardEvent) {
-		console.log('paste event', e);
 		const file = e.clipboardData?.files[0];
 		if (file) handleFile(file);
 
 		const text = e.clipboardData?.getData('text/plain');
-		if (text) viewer.loadModel(text);
+		if (text) viewer.loadModel({ model: text });
 	}
 
 	function handleDrop(e: DragEvent) {
-		console.log('drop event', e);
 		e.preventDefault();
 
 		const file = e.dataTransfer?.files[0];
 		if (file) handleFile(file);
 
 		const text = e.dataTransfer?.getData('text/plain');
-		if (text && !file) viewer.loadModel(text);
+		if (text && !file) viewer.loadModel({ model: text });
 	}
 </script>
 
@@ -140,7 +137,7 @@
 			<Extras />
 		</Tabs.Content>
 		<Tabs.Content value="models">
-			<!-- <Models /> -->
+			<Models />
 		</Tabs.Content>
 		<Tabs.Content value="export">
 			<!-- <Export /> -->
@@ -190,19 +187,6 @@
 			color: var(--pico-muted-color);
 			font-size: 80%;
 		}
-	}
-
-	.btn-reset {
-		--pico-color: var(--pico-color) !important;
-		color: var(--pico-color);
-		background-color: transparent;
-		outline: none;
-		border: none;
-		border-radius: 0;
-		margin: 0;
-		padding: 0;
-		box-shadow: none;
-		transition: none;
 	}
 
 	.tablist-container {

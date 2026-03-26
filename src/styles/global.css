@@ -1,6 +1,7 @@
 :root {
 	--pico-form-element-spacing-vertical: 0.25rem;
 	--pico-form-element-spacing-horizontal: 1rem;
+	--pico-initial-background-color: var(--pico-background-color);
 }
 
 @media (min-width: 1280px) {
@@ -96,6 +97,19 @@ textarea {
 	&::-webkit-scrollbar-corner {
 		background-color: transparent;
 	}
+}
+
+.btn-reset {
+	--pico-color: var(--pico-color) !important;
+	color: var(--pico-color);
+	background-color: transparent;
+	outline: none;
+	border: none;
+	border-radius: 0;
+	margin: 0;
+	padding: 0;
+	box-shadow: none;
+	transition: none;
 }
 
 .form-margin {

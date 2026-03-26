@@ -30,12 +30,12 @@ class Viewer {
 		this.pico.enableCameraControls();
 	}
 
-	loadModel(model: string, state?: PicoCAD2ViewerState) {
+	loadModel({ model, state }: { model?: string; state?: PicoCAD2ViewerState }) {
 		const currentState = this.pico.getState();
 		try {
 			if (state) {
 				this.pico.setState(state);
-			} else {
+			} else if (model) {
 				this.pico.load(model, true);
 			}
 		} catch (e) {
@@ -85,6 +85,14 @@ class Viewer {
 		const state = this.pico.getState();
 		this.settings = state.settings;
 		this.extras = state.extras;
+	}
+
+	getState() {
+		return this.pico.getState();
+	}
+
+	getImage() {
+		return this.pico.toDataURL();
 	}
 }
 
