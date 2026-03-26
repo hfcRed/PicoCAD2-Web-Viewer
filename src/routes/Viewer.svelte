@@ -5,6 +5,7 @@
 	import { model } from './model';
 	import Camera from './Camera.svelte';
 	import Settings from './Settings.svelte';
+	import Extras from './Extras.svelte';
 
 	let viewportCanvas: HTMLCanvasElement;
 
@@ -26,6 +27,8 @@
 				tab = 'extras';
 			} else if (e.key === '4') {
 				tab = 'models';
+			} else if (e.key === '5') {
+				tab = 'export';
 			}
 		};
 
@@ -38,6 +41,11 @@
 <div class="grid-container">
 	<div class="canvas-container">
 		<canvas bind:this={viewportCanvas}></canvas>
+		<div class="stats">
+			<p>FPS: {viewer.stats.fps}</p>
+			<p>Draw Calls: {viewer.stats.drawCalls}</p>
+			<p>Poly Count: {viewer.stats.polyCount}</p>
+		</div>
 	</div>
 	<Tabs.Root orientation="horizontal" bind:value={tab}>
 		<Tabs.List>
@@ -72,6 +80,13 @@
 								</div>
 							{/snippet}
 						</Tabs.Trigger>
+						<Tabs.Trigger value="export">
+							{#snippet child({ props })}
+								<div class="tab">
+									<button class="btn-reset" {...props}>Export</button>
+								</div>
+							{/snippet}
+						</Tabs.Trigger>
 					</div>
 				</div>
 			{/snippet}
@@ -83,10 +98,13 @@
 			<Settings />
 		</Tabs.Content>
 		<Tabs.Content value="extras">
-			<!-- <Extras /> -->
+			<Extras />
 		</Tabs.Content>
 		<Tabs.Content value="models">
 			<!-- <Models /> -->
+		</Tabs.Content>
+		<Tabs.Content value="export">
+			<!-- <Export /> -->
 		</Tabs.Content>
 	</Tabs.Root>
 </div>
@@ -111,18 +129,27 @@
 		left: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 0.5rem;
 		width: 100%;
 		aspect-ratio: 1 / 1;
 		z-index: 10;
 
 		canvas {
-			border: var(--pico-border-width) solid var(--pico-form-element-border-color);
 			border-radius: var(--pico-border-radius);
 			background-color: black;
 			aspect-ratio: 1 / 1;
 			width: 100% !important;
 			height: auto !important;
+		}
+	}
+
+	.stats {
+		display: flex;
+		gap: 0.5rem;
+
+		p {
+			color: var(--pico-muted-color);
+			font-size: 80%;
 		}
 	}
 

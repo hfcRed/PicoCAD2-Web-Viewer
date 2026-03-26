@@ -1,20 +1,28 @@
 import {
 	PicoCAD2Viewer,
+	PicoCAD2Context,
 	type ViewerSettings,
 	type ExtrasOptions,
-	type PicoCAD2ViewerState
+	type PicoCAD2ViewerState,
+	type RenderStats
 } from 'picocad2-web';
 import { DEFAULT_SETTINGS, DEFAULT_EXTRAS, CAMERA_LIMITS } from './constants';
+
+type Stats = RenderStats & { fps: number };
 
 class Viewer {
 	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
 	extras = $state<Required<ExtrasOptions>>({ ...DEFAULT_EXTRAS });
+	stats = $state<Stats>({ drawCalls: 0, polyCount: 0, fps: 0 });
 
+	context!: PicoCAD2Context;
 	pico!: PicoCAD2Viewer;
 
 	init(canvas: HTMLCanvasElement) {
+		this.context = new PicoCAD2Context();
 		this.pico = new PicoCAD2Viewer({
 			canvas,
+			context: this.context,
 			resolution: { width: 128, height: 128, scale: 4 }
 		});
 	}
@@ -29,7 +37,21 @@ class Viewer {
 		this.pico.startRenderLoop();
 		this.pico.enableCameraControls();
 
+		let lastTime = performance.now();
+		let frameCount = 0;
+
 		this.pico.onFrame = () => {
+			const now = performance.now();
+			frameCount++;
+
+			if (now - lastTime >= 1000) {
+				this.stats.fps = Math.round((frameCount * 1000) / (now - lastTime));
+				lastTime = now;
+				frameCount = 0;
+			}
+
+			this.stats = { ...this.context.stats, fps: this.stats.fps };
+
 			const { rotation, tilt, distance } = CAMERA_LIMITS;
 
 			this.settings.animation.time = this.pico.animation.time;
