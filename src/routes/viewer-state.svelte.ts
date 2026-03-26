@@ -25,17 +25,23 @@ class Viewer {
 			context: this.context,
 			resolution: { width: 128, height: 128, scale: 4 }
 		});
-	}
-
-	loadModel(model: string, state?: PicoCAD2ViewerState) {
-		if (state) {
-			this.pico.setState(state);
-		} else {
-			this.pico.load(model, true);
-		}
 
 		this.pico.startRenderLoop();
 		this.pico.enableCameraControls();
+	}
+
+	loadModel(model: string, state?: PicoCAD2ViewerState) {
+		const currentState = this.pico.getState();
+		try {
+			if (state) {
+				this.pico.setState(state);
+			} else {
+				this.pico.load(model, true);
+			}
+		} catch (e) {
+			console.error('Failed to load model:', e);
+			this.pico.setState(currentState);
+		}
 
 		let lastTime = performance.now();
 		let frameCount = 0;

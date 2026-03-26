@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { Tabs } from 'bits-ui';
 	import { viewer } from './viewer-state.svelte';
 	import { model } from './model';
@@ -11,36 +10,76 @@
 
 	let tab = $state('camera');
 
-	onMount(() => {
-		viewer.init(viewportCanvas);
+	function attachViewer(e: HTMLCanvasElement) {
+		viewer.init(e);
 		viewer.loadModel(JSON.stringify(model));
+	}
 
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.ctrlKey || e.metaKey) return;
-			if (e.target !== document.body) return;
+	function handleKeyDown(e: KeyboardEvent) {
+		if (e.ctrlKey || e.metaKey) return;
+		if (e.target !== document.body) return;
 
-			if (e.key === '1') {
-				tab = 'camera';
-			} else if (e.key === '2') {
-				tab = 'settings';
-			} else if (e.key === '3') {
-				tab = 'extras';
-			} else if (e.key === '4') {
-				tab = 'models';
-			} else if (e.key === '5') {
-				tab = 'export';
+		if (e.key === '1') {
+			tab = 'camera';
+		} else if (e.key === '2') {
+			tab = 'settings';
+		} else if (e.key === '3') {
+			tab = 'extras';
+		} else if (e.key === '4') {
+			tab = 'models';
+		} else if (e.key === '5') {
+			tab = 'export';
+		}
+	}
+
+	function handleFile(file: File) {
+		const extension = file.name.split('.').pop()?.toLowerCase();
+
+		if (extension === 'txt') return;
+
+		const reader = new FileReader();
+		reader.onload = (event) => {
+			const content = event.target?.result;
+			if (typeof content === 'string') {
+				viewer.loadModel(content);
 			}
 		};
+		reader.readAsText(file);
+	}
 
-		window.addEventListener('keydown', handleKeyDown);
+	function handlePaste(e: ClipboardEvent) {
+		console.log('paste event', e);
+		const file = e.clipboardData?.files[0];
+		if (file) handleFile(file);
 
-		return () => window.removeEventListener('keydown', handleKeyDown);
-	});
+		const text = e.clipboardData?.getData('text/plain');
+		if (text) viewer.loadModel(text);
+	}
+
+	function handleDrop(e: DragEvent) {
+		console.log('drop event', e);
+		e.preventDefault();
+
+		const file = e.dataTransfer?.files[0];
+		if (file) handleFile(file);
+
+		const text = e.dataTransfer?.getData('text/plain');
+		if (text && !file) viewer.loadModel(text);
+	}
 </script>
+
+<svelte:window
+	onkeydown={handleKeyDown}
+	onpaste={handlePaste}
+	ondrop={handleDrop}
+	ondragenter={(e: Event) => e.preventDefault()}
+	ondragover={(e: Event) => e.preventDefault()}
+	ondragleave={(e: Event) => e.preventDefault()}
+/>
 
 <div class="grid-container">
 	<div class="canvas-container">
-		<canvas bind:this={viewportCanvas}></canvas>
+		<canvas bind:this={viewportCanvas} {@attach attachViewer}></canvas>
 		<div class="stats">
 			<p>FPS: {viewer.stats.fps}</p>
 			<p>Draw Calls: {viewer.stats.drawCalls}</p>
