@@ -14,6 +14,7 @@ class Viewer {
 	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
 	extras = $state<Required<ExtrasOptions>>({ ...DEFAULT_EXTRAS });
 	stats = $state<Stats>({ drawCalls: 0, polyCount: 0, fps: 0 });
+	loaded = $state(false);
 
 	context!: PicoCAD2Context;
 	pico!: PicoCAD2Viewer;
@@ -73,6 +74,7 @@ class Viewer {
 			};
 		};
 
+		this.loaded = true;
 		this.updateState();
 	}
 

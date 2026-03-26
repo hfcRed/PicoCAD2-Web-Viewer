@@ -74,13 +74,51 @@
 	ondragleave={(e: Event) => e.preventDefault()}
 />
 
+<h1>PicoCAD 2 Web Viewer</h1>
+
+<p>
+	A web-based viewer for PicoCAD 2 models. View, edit, apply effects, and share your PicoCAD 2
+	creations directly in the browser.
+</p>
+<p>
+	Built on top of
+	<a href="https://github.com/hfcRed/PicoCAD2-Web" target="_blank" rel="noopener noreferrer"
+		>PicoCAD2-Web</a
+	>, a JavaScript library for rendering PicoCAD2 models in the browser.
+</p>
+
+<div class="credits">
+	<small
+		>Made by
+		<a href="https://github.com/hfcRed" target="_blank" rel="noopener noreferrer">hfcRed</a>
+	</small>
+	<span>•</span>
+	<small
+		>Source code on
+		<a
+			href="https://github.com/hfcRed/PicoCAD2-Web-Viewer"
+			target="_blank"
+			rel="noopener noreferrer"
+			>GitHub
+		</a>
+	</small>
+</div>
+
+<hr />
 <div class="grid-container">
 	<div class="canvas-container">
-		<canvas bind:this={viewportCanvas} {@attach attachViewer}></canvas>
+		<div class="canvas-wrapper">
+			<canvas bind:this={viewportCanvas} {@attach attachViewer}></canvas>
+			{#if !viewer.loaded}
+				<small
+					>Drag and drop or copy and paste a model file or string to load it into the viewer</small
+				>
+			{/if}
+		</div>
 		<div class="stats">
-			<p>FPS: {viewer.stats.fps}</p>
-			<p>Draw Calls: {viewer.stats.drawCalls}</p>
-			<p>Poly Count: {viewer.stats.polyCount}</p>
+			<small>FPS: {viewer.stats.fps}</small>
+			<small>Draw Calls: {viewer.stats.drawCalls}</small>
+			<small>Poly Count: {viewer.stats.polyCount}</small>
 		</div>
 	</div>
 	<Tabs.Root orientation="horizontal" bind:value={tab}>
@@ -146,11 +184,23 @@
 </div>
 
 <style>
+	h1 {
+		margin-top: calc(var(--pico-typography-spacing-vertical) * 2);
+	}
+
+	hr {
+		margin-block: calc(var(--pico-typography-spacing-vertical) * 2);
+	}
+
+	.credits {
+		color: var(--pico-muted-color);
+	}
+
 	.grid-container {
+		margin-bottom: calc(var(--pico-typography-spacing-vertical) * 2);
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
-		padding: 1rem 0;
 
 		@media (max-width: 768px) {
 			grid-template-columns: 1fr;
@@ -159,9 +209,8 @@
 	}
 
 	.canvas-container {
-		padding-top: 2rem;
 		position: sticky;
-		top: 0;
+		top: 2rem;
 		left: 0;
 		display: flex;
 		flex-direction: column;
@@ -171,11 +220,26 @@
 		z-index: 10;
 
 		canvas {
+			border: var(--pico-border-width) solid var(--pico-form-element-border-color);
 			border-radius: var(--pico-border-radius);
-			background-color: black;
+			background-color: var(--pico-form-element-background-color);
 			aspect-ratio: 1 / 1;
 			width: 100% !important;
 			height: auto !important;
+		}
+	}
+
+	.canvas-wrapper {
+		position: relative;
+
+		small {
+			color: var(--pico-muted-color);
+			position: absolute;
+			inset: 0;
+			top: 50%;
+			padding-inline: 5rem;
+			text-align: center;
+			text-wrap: balance;
 		}
 	}
 
@@ -183,9 +247,8 @@
 		display: flex;
 		gap: 0.5rem;
 
-		p {
+		small {
 			color: var(--pico-muted-color);
-			font-size: 80%;
 		}
 	}
 
