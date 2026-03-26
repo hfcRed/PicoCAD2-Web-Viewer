@@ -39,64 +39,139 @@ export const DEFAULT_SETTINGS = {
 export const DEFAULT_EXTRAS = {
 	wireframe: {
 		enabled: false,
+		modelOnly: true,
 		color: [0, 0, 0]
 	},
 	gradientOutline: {
 		enabled: false,
+		modelOnly: true,
 		size: 0,
 		colorFrom: [0, 0, 0],
 		colorTo: [0, 0, 0],
 		gradient: 0,
 		gradientDirection: 0
 	},
+	depthFog: {
+		enabled: false,
+		modelOnly: true,
+		color: [0, 0, 0],
+		near: 0,
+		far: 0,
+		density: 0,
+		mode: 'linear'
+	},
+	edgeDetection: {
+		enabled: false,
+		modelOnly: true,
+		threshold: 0,
+		lineColor: [0, 0, 0],
+		backgroundColor: [0, 0, 0],
+		blend: 0
+	},
 	colorGrading: {
 		enabled: false,
+		modelOnly: true,
 		brightness: 0,
 		contrast: 0,
 		saturation: 0,
 		hue: 0
 	},
+	colorTint: {
+		enabled: false,
+		modelOnly: true,
+		mode: 'tint',
+		color: [0, 0, 0],
+		intensity: 0,
+		shadowColor: [0, 0, 0],
+		highlightColor: [0, 0, 0],
+		blend: 0
+	},
 	posterization: {
 		enabled: false,
+		modelOnly: true,
 		levels: 0,
 		channelLevels: [0, 0, 0],
 		gamma: 0,
 		colorBanding: false
 	},
+	sharpen: {
+		enabled: false,
+		modelOnly: true,
+		strength: 0,
+		threshold: 0
+	},
 	bloom: {
 		enabled: false,
+		modelOnly: true,
 		threshold: 0,
 		intensity: 0,
 		blur: 0
 	},
 	dithering: {
 		enabled: false,
+		modelOnly: true,
 		amount: 0,
 		blend: 0,
 		channelAmount: [0, 0, 0]
 	},
+	halftone: {
+		enabled: false,
+		modelOnly: true,
+		dotSize: 0,
+		angle: 0,
+		blend: 0,
+		mode: 'dots'
+	},
 	crt: {
 		enabled: false,
+		modelOnly: true,
 		curvature: 0,
 		scanlineIntensity: 0
 	},
 	pixelation: {
 		enabled: false,
+		modelOnly: true,
 		pixelSize: 0,
 		shape: 'square',
 		blend: 0
 	},
 	lensDistortion: {
 		enabled: false,
+		modelOnly: true,
 		strength: 0,
 		zoom: 0
 	},
-	noise: {
-		enabled: false,
-		amount: 0
-	},
 	chromaticAberration: {
 		enabled: false,
-		strength: 0
+		modelOnly: true,
+		strength: 0,
+		redOffset: 0,
+		greenOffset: 0,
+		blueOffset: 0,
+		radialFalloff: 0,
+		centerX: 0,
+		centerY: 0
+	},
+	noise: {
+		enabled: false,
+		modelOnly: true,
+		amount: 0
+	},
+	glitch: {
+		enabled: false,
+		modelOnly: true,
+		intensity: 0,
+		speed: 0,
+		blockSize: 0,
+		rgbSplit: false,
+		lineShift: false
+	},
+	vignette: {
+		enabled: false,
+		modelOnly: true,
+		intensity: 0,
+		smoothness: 0,
+		roundness: 0,
+		color: [0, 0, 0]
 	}
 } as const satisfies Required<ExtrasOptions>;

@@ -22,6 +22,7 @@
 html {
 	color-scheme: light dark;
 	accent-color: var(--pico-primary);
+	scrollbar-gutter: stable;
 }
 
 body {
