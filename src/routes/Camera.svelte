@@ -7,6 +7,10 @@
 </script>
 
 <h3>Camera Settings</h3>
+<fieldset class="grid">
+	<button onclick={() => viewer.loadBookmark()}>Load Bookmark</button>
+	<button onclick={() => viewer.setBookmark()}>Set Bookmark</button>
+</fieldset>
 <fieldset>
 	<legend>
 		<h4>Camera Mode</h4>
@@ -51,7 +55,7 @@
 	</label>
 	<NumericControl
 		disabled={disableSpeed}
-		label="Movement Speed"
+		label="Movement Time"
 		min={0.01}
 		max={20}
 		step={0.01}

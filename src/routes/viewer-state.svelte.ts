@@ -96,6 +96,21 @@ class Viewer {
 	getImage() {
 		return this.pico.toDataURL();
 	}
+
+	loadBookmark() {
+		this.pico.useBookmark();
+		this.updateState();
+	}
+
+	setBookmark() {
+		this.pico.setBookmark({
+			omega: this.settings.camera.omega,
+			theta: this.settings.camera.theta,
+			distanceToTarget: this.settings.camera.distanceToTarget,
+			target: new Float32Array(this.settings.camera.target)
+		});
+		this.updateState();
+	}
 }
 
 export const viewer = new Viewer();
