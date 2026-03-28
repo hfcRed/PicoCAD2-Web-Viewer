@@ -26,14 +26,11 @@
 
 		const existingIndex = savedModels.current.findIndex((model) => model.name === viewer.name);
 		if (existingIndex !== -1) {
-			savedModels.current[existingIndex] = {
-				state,
-				image,
-				selected: savedModels.current[existingIndex].selected,
-				name: viewer.name
-			};
+			const selected = savedModels.current[existingIndex].selected;
+			savedModels.current.splice(existingIndex, 1);
+			savedModels.current.unshift({ state, image, selected, name: viewer.name });
 		} else {
-			savedModels.current.push({ state, image, selected: false, name: viewer.name });
+			savedModels.current.unshift({ state, image, selected: false, name: viewer.name });
 		}
 	}
 
@@ -65,7 +62,7 @@
 		<input type="text" autocomplete="off" autocorrect="off" bind:value={viewer.name} />
 	</label>
 	<fieldset class="grid">
-		<button onclick={() => saveModel()}>Save</button>
+		<button onclick={() => saveModel()} disabled={!viewer.loaded}>Save</button>
 		<button onclick={() => loadModel()} disabled={!savedSelected}>Load</button>
 		<button onclick={() => deleteModel()} disabled={!savedSelected}>Delete</button>
 	</fieldset>
