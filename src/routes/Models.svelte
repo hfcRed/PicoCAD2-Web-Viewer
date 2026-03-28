@@ -35,8 +35,6 @@
 		} else {
 			savedModels.current.push({ state, image, selected: false, name: viewer.name });
 		}
-
-		console.log({ state, image, selected: false, name: viewer.name });
 	}
 
 	function loadModel() {
