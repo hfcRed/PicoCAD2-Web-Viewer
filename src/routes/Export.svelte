@@ -44,6 +44,14 @@
 
 		navigator.clipboard.writeText(data);
 	}
+
+	$effect(() => {
+		void viewer.settings;
+		void viewer.extras;
+
+		generatedLink = '';
+		currentState = '';
+	});
 </script>
 
 <fieldset class="grid gif" disabled={!viewer.loaded}>

@@ -85,6 +85,8 @@ class Viewer {
 	}
 
 	loadModel({ model, state }: { model?: string; state?: PicoCAD2ViewerState }) {
+		this.stopGIFRecording();
+
 		const currentState = this.pico.getState();
 		try {
 			if (state) {
@@ -136,7 +138,7 @@ class Viewer {
 		this.updateState();
 	}
 
-	updateState() {
+	private updateState() {
 		const state = this.pico.getState();
 		this.settings = state.settings;
 		this.extras = state.extras;
