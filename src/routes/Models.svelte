@@ -53,6 +53,7 @@
 		if (index === -1) return;
 
 		savedModels.current.splice(index, 1);
+		if (savedModels.current.length === 0) savedModels.disconnect();
 	}
 </script>
 
