@@ -36,7 +36,6 @@
 	}
 </script>
 
-<h3>Model Settings</h3>
 <fieldset>
 	<legend>
 		<h4>Rendering</h4>
@@ -64,7 +63,9 @@
 		Shading
 	</label>
 </fieldset>
+
 <hr />
+
 <fieldset>
 	<legend>
 		<h4>Outline</h4>
@@ -89,7 +90,9 @@
 		/>
 	</label>
 </fieldset>
+
 <hr />
+
 <fieldset>
 	<legend>
 		<h4>Tags</h4>
@@ -137,7 +140,9 @@
 		/>
 	</label>
 </fieldset>
+
 <hr />
+
 <fieldset>
 	<legend>
 		<label class="form-collapse">
@@ -163,7 +168,9 @@
 		/>
 	{/if}
 </fieldset>
+
 <hr />
+
 <fieldset>
 	<legend>
 		<label class="form-collapse">
@@ -189,7 +196,9 @@
 		</label>
 	{/if}
 </fieldset>
+
 <hr />
+
 <fieldset>
 	<legend>
 		<label class="form-collapse">

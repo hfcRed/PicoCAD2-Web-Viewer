@@ -4,11 +4,11 @@
 	import { hexToRGB, rgbToHex } from './utils';
 </script>
 
-<h3>Extra Settings</h3>
 <p>
 	Effects apply in the same order they are listed. Disabling <code>Model Only</code> on any effect will
-	apply all following effects to the entire screen as well!
+	apply all following effects to the entire screen as well.
 </p>
+
 <fieldset>
 	<legend>
 		<label class="form-collapse">

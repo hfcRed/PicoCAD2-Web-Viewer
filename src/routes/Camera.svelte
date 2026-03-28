@@ -6,11 +6,13 @@
 	let disableSpeed = $derived(viewer.settings.animation.playing);
 </script>
 
-<h3>Camera Settings</h3>
 <fieldset class="grid">
 	<button onclick={() => viewer.loadBookmark()}>Load Bookmark</button>
 	<button onclick={() => viewer.setBookmark()}>Set Bookmark</button>
 </fieldset>
+
+<hr />
+
 <fieldset>
 	<legend>
 		<h4>Camera Mode</h4>
@@ -56,9 +58,9 @@
 	<NumericControl
 		disabled={disableSpeed}
 		label="Movement Time"
-		min={0.01}
+		min={0}
 		max={20}
-		step={0.01}
+		step={1}
 		bind:value={
 			() => viewer.settings.cameraModeSpeed,
 			(v) => viewer.update((pico) => (pico.cameraModeSpeed = v))
@@ -70,7 +72,9 @@
 		>
 	{/if}
 </fieldset>
+
 <hr />
+
 <fieldset>
 	<legend>
 		<h4>Camera Values</h4>
@@ -104,7 +108,9 @@
 		}
 	/>
 </fieldset>
+
 <hr />
+
 <fieldset>
 	<legend>
 		<h4>Camera Target</h4>

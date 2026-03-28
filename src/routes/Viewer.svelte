@@ -5,6 +5,8 @@
 	import Settings from './Settings.svelte';
 	import Extras from './Extras.svelte';
 	import Models from './Models.svelte';
+	import Export from './Export.svelte';
+	import { decompressState } from './utils';
 
 	let viewportCanvas: HTMLCanvasElement;
 
@@ -12,6 +14,17 @@
 
 	function attachViewer(e: HTMLCanvasElement) {
 		viewer.init(e);
+
+		const urlParams = new URLSearchParams(window.location.search);
+		const stateParam = urlParams.get('state');
+		if (!stateParam) return;
+
+		const decompressed = decompressState(stateParam);
+		if (!decompressed) return;
+
+		if (stateParam) {
+			viewer.loadModel({ state: decompressed });
+		}
 	}
 
 	function handleKeyDown(e: KeyboardEvent) {
@@ -178,7 +191,7 @@
 			<Models />
 		</Tabs.Content>
 		<Tabs.Content value="export">
-			<!-- <Export /> -->
+			<Export />
 		</Tabs.Content>
 	</Tabs.Root>
 </div>

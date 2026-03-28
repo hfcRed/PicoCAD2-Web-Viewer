@@ -15,7 +15,6 @@
 		import: 'default'
 	});
 
-	let name = $state('untitled');
 	let savedModels = new PersistedState<SavedModel[]>('savedModels', [
 		...Object.values(defaultModels)
 	]);
@@ -25,19 +24,19 @@
 		const state = compressState(viewer.getState());
 		const image = viewer.getImage();
 
-		const existingIndex = savedModels.current.findIndex((model) => model.name === name);
+		const existingIndex = savedModels.current.findIndex((model) => model.name === viewer.name);
 		if (existingIndex !== -1) {
 			savedModels.current[existingIndex] = {
 				state,
 				image,
 				selected: savedModels.current[existingIndex].selected,
-				name
+				name: viewer.name
 			};
 		} else {
-			savedModels.current.push({ state, image, selected: false, name });
+			savedModels.current.push({ state, image, selected: false, name: viewer.name });
 		}
 
-		console.log({ state, image, selected: false, name });
+		console.log({ state, image, selected: false, name: viewer.name });
 	}
 
 	function loadModel() {
@@ -48,7 +47,7 @@
 		if (!state) return;
 
 		viewer.loadModel({ state });
-		name = model.name;
+		viewer.name = model.name;
 	}
 
 	function deleteModel() {
@@ -65,7 +64,7 @@
 <div class="images-container">
 	<label>
 		Name
-		<input type="text" autocomplete="off" autocorrect="off" bind:value={name} />
+		<input type="text" autocomplete="off" autocorrect="off" bind:value={viewer.name} />
 	</label>
 	<fieldset class="grid">
 		<button onclick={() => saveModel()}>Save</button>

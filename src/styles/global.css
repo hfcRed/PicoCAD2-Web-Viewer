@@ -6,12 +6,12 @@
 
 @media (min-width: 1280px) {
 	.container {
-		max-width: 900px;
+		max-width: 950px;
 	}
 }
 @media (min-width: 1536px) {
 	.container {
-		max-width: 900px;
+		max-width: 950px;
 	}
 }
 
@@ -110,6 +110,10 @@ textarea {
 	padding: 0;
 	box-shadow: none;
 	transition: none;
+}
+
+.grid > button {
+	margin-bottom: var(--pico-spacing);
 }
 
 .form-margin {
