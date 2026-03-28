@@ -23,7 +23,6 @@ export function rgbToHex(c: [number, number, number]): string {
 }
 
 export function compressState(state: PicoCAD2ViewerState) {
-	state.source = JSON.parse(state.source ?? '{}');
 	return LZString.compressToEncodedURIComponent(JSON.stringify(state));
 }
 
@@ -32,10 +31,7 @@ export function decompressState(compressed: string) {
 		const json = LZString.decompressFromEncodedURIComponent(compressed);
 		if (!json) throw new Error('Failed to decompress state');
 
-		const decompressed = JSON.parse(json) as PicoCAD2ViewerState;
-		decompressed.source = JSON.stringify(decompressed.source ?? {});
-
-		return decompressed;
+		return JSON.parse(json) as PicoCAD2ViewerState;
 	} catch (e) {
 		console.error('Error decompressing state:', e);
 		return null;
