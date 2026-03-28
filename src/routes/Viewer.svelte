@@ -45,10 +45,6 @@
 	}
 
 	function handleFile(file: File) {
-		const extension = file.name.split('.').pop()?.toLowerCase();
-
-		if (extension === 'txt') return;
-
 		const reader = new FileReader();
 		reader.onload = (event) => {
 			const content = event.target?.result;
@@ -59,9 +55,21 @@
 		reader.readAsText(file);
 	}
 
+	function getFile(items: DataTransferItemList | undefined): File | null {
+		if (!items) return null;
+
+		for (const item of items) {
+			if (item.kind === 'file') {
+				return item.getAsFile();
+			}
+		}
+
+		return null;
+	}
+
 	function handlePaste(e: ClipboardEvent) {
-		const file = e.clipboardData?.files[0];
-		if (file) handleFile(file);
+		const file = getFile(e.clipboardData?.items);
+		if (file) return handleFile(file);
 
 		const text = e.clipboardData?.getData('text/plain');
 		if (text) viewer.loadModel({ model: text });
@@ -70,11 +78,11 @@
 	function handleDrop(e: DragEvent) {
 		e.preventDefault();
 
-		const file = e.dataTransfer?.files[0];
-		if (file) handleFile(file);
+		const file = getFile(e.dataTransfer?.items);
+		if (file) return handleFile(file);
 
 		const text = e.dataTransfer?.getData('text/plain');
-		if (text && !file) viewer.loadModel({ model: text });
+		if (text) viewer.loadModel({ model: text });
 	}
 </script>
 
