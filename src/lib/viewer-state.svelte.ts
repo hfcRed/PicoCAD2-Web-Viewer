@@ -135,6 +135,7 @@ class Viewer {
 	}
 
 	update(fn: (pico: PicoCAD2Viewer) => void) {
+		if (!this.loaded) return;
 		fn(this.pico);
 		this.updateState();
 	}
