@@ -110,7 +110,7 @@
 		<input
 			type="color"
 			bind:value={
-				() => rgbToHex(viewer.settings.leftTag?.color ?? [255, 255, 255]),
+				() => rgbToHex(viewer.settings.leftTag?.color ?? [0, 0, 0]),
 				(v: string) =>
 					viewer.update((pico) =>
 						pico.leftTag ? (pico.leftTag = { ...pico.leftTag, color: hexToRGB(v) }) : null
@@ -131,7 +131,7 @@
 		<input
 			type="color"
 			bind:value={
-				() => rgbToHex(viewer.settings.rightTag?.color ?? [255, 255, 255]),
+				() => rgbToHex(viewer.settings.rightTag?.color ?? [0, 0, 0]),
 				(v: string) =>
 					viewer.update((pico) =>
 						pico.rightTag ? (pico.rightTag = { ...pico.rightTag, color: hexToRGB(v) }) : null
