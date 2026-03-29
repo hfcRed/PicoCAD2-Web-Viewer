@@ -1,14 +1,12 @@
 <script lang="ts">
 	import { Tabs } from 'bits-ui';
-	import { viewer } from './viewer-state.svelte';
+	import { viewer } from '../viewer-state.svelte';
 	import Camera from './Camera.svelte';
 	import Settings from './Settings.svelte';
 	import Extras from './Extras.svelte';
 	import Models from './Models.svelte';
 	import Export from './Export.svelte';
-	import { decompressState } from './utils';
-
-	let viewportCanvas: HTMLCanvasElement;
+	import { decompressState } from '../utils';
 
 	let tab = $state('camera');
 
@@ -143,7 +141,7 @@
 <div class="grid-container">
 	<div class="canvas-container">
 		<div class="canvas-wrapper">
-			<canvas bind:this={viewportCanvas} {@attach attachViewer}></canvas>
+			<canvas {@attach attachViewer}></canvas>
 			{#if !viewer.loaded}
 				<small
 					>Drag and drop or copy and paste a model file or string to load it into the viewer</small

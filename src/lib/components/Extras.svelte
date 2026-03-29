@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { viewer } from './viewer-state.svelte';
+	import { viewer } from '../viewer-state.svelte';
 	import NumericControl from '$lib/components/NumericControl.svelte';
-	import { hexToRGB, rgbToHex } from './utils';
+	import { hexToRGB, rgbToHex } from '../utils';
 </script>
 
 <p>

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { compressState } from './utils';
-	import { viewer } from './viewer-state.svelte';
+	import { compressState } from '../utils';
+	import { viewer } from '../viewer-state.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 
 	const resolutions = [

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { viewer } from './viewer-state.svelte';
-	import { hexToRGB, rgbToHex } from './utils';
+	import { viewer } from '../viewer-state.svelte';
+	import { hexToRGB, rgbToHex } from '../utils';
 	import NumericControl from '$lib/components/NumericControl.svelte';
 
 	let customBackground = $state(!!viewer.settings.backgroundColor);

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { viewer } from './viewer-state.svelte';
-	import { CAMERA_LIMITS } from './constants';
+	import { viewer } from '../viewer-state.svelte';
+	import { CAMERA_LIMITS } from '../constants';
 	import NumericControl from '$lib/components/NumericControl.svelte';
 
 	let disableSpeed = $derived(viewer.settings.animation.playing);

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PersistedState } from 'runed';
-	import { compressState, decompressState } from './utils';
-	import { viewer } from './viewer-state.svelte';
+	import { compressState, decompressState } from '../utils';
+	import { viewer } from '../viewer-state.svelte';
 
 	interface SavedModel {
 		state: string;
