@@ -87,7 +87,7 @@ class Viewer {
 	loadModel({ model, state }: { model?: string; state?: PicoCAD2ViewerState }) {
 		this.stopGIFRecording();
 
-		const currentState = this.pico.getState();
+		const currentState = this.loaded ? this.pico.getState() : null;
 		try {
 			if (state) {
 				this.pico.setState(state);
@@ -96,6 +96,7 @@ class Viewer {
 			}
 		} catch (e) {
 			console.error('Failed to load model:', e);
+			if (!currentState) return;
 			this.pico.setState(currentState);
 		}
 
