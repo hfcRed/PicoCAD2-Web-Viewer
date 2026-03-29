@@ -1,42 +1,34 @@
-# sv
+<div align="center">
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+# PicoCAD 2 Web Viewer
 
-## Creating a project
+A web-based viewer for PicoCAD 2 models. View, edit, apply effects, and share your PicoCAD 2 creations directly in the browser. Built on top of [PicoCAD2-Web](https://github.com/hfcRed/PicoCAD2-Web), a JavaScript library for rendering PicoCAD2 models in the browser.
 
-If you're seeing this, you've probably already done this step. Congrats!
+</div>
 
-```sh
-# create a new project
-npx sv create my-app
-```
+---
 
-To recreate this project with the same configuration:
+## Tech Stack
 
-```sh
-# recreate this project
-pnpm dlx sv@0.12.8 create --template minimal --types ts --add prettier eslint sveltekit-adapter="adapter:cloudflare+cfTarget:workers" --install pnpm PicoCAD2-Web-Viewer
-```
+- SvelteKit
+- Typescript
 
-## Developing
+## Running locally
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Prerequisites
 
-```sh
-npm run dev
+First, install these programs if you do not have them installed already:
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+- [Node](https://nodejs.org/en)
+- [Git](https://git-scm.com)
+- [pnpm](https://pnpm.io/installation)
 
-## Building
+### Commands
 
-To create a production version of your app:
+- `pnpm install` to install all dependencies
 
-```sh
-npm run build
-```
+To start testing locally you can use the following commands:
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- `pnpm run dev` to start a local dev server at `localhost:5173`
+- `pnpm run build` to create a build of the website
+- `pnpm run preview` to preview the build at `localhost:4173`
