@@ -2,6 +2,7 @@
 	import { PersistedState } from 'runed';
 	import { compressState, decompressState } from '../utils';
 	import { viewer } from '../viewer-state.svelte';
+	import { browser } from '$app/environment';
 
 	interface SavedModel {
 		state: string;
@@ -15,10 +16,11 @@
 		import: 'default'
 	});
 
-	let savedModels = new PersistedState<SavedModel[]>('savedModels', [
-		...Object.values(defaultModels)
-	]);
-	let savedSelected = $derived(savedModels.current.find((model) => model.selected));
+	let savedModels = browser
+		? new PersistedState<SavedModel[]>('savedModels', [...Object.values(defaultModels)])
+		: { current: [] as SavedModel[], disconnect: () => {} };
+
+	let savedSelected = $derived(savedModels?.current.find((model) => model.selected));
 
 	function saveModel() {
 		const state = compressState(viewer.getState());
