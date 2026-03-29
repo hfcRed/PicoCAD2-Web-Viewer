@@ -54,7 +54,7 @@
 	});
 </script>
 
-<fieldset class="grid gif" disabled={!viewer.loaded}>
+<fieldset class="grid gif">
 	<legend>
 		<h4>Record Gif</h4>
 	</legend>
@@ -84,7 +84,7 @@
 
 <hr />
 
-<fieldset disabled={!viewer.loaded}>
+<fieldset>
 	<legend>
 		<h4>Generate Link</h4>
 	</legend>
@@ -100,7 +100,7 @@
 
 <hr />
 
-<fieldset disabled={!viewer.loaded}>
+<fieldset>
 	<legend>
 		<h4>Export Formats</h4>
 	</legend>

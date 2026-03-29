@@ -8,7 +8,7 @@
 	import Export from './Export.svelte';
 	import { decompressState } from '../utils';
 
-	let tab = $state('camera');
+	let tab = $state('models');
 
 	function attachViewer(e: HTMLCanvasElement) {
 		viewer.init(e);
@@ -159,21 +159,21 @@
 			{#snippet child()}
 				<div class="tablist-container scrollbar">
 					<div class="tablist">
-						<Tabs.Trigger value="camera">
+						<Tabs.Trigger value="camera" disabled={!viewer.loaded}>
 							{#snippet child({ props })}
 								<div class="tab">
 									<button class="btn-reset" {...props}>Camera</button>
 								</div>
 							{/snippet}
 						</Tabs.Trigger>
-						<Tabs.Trigger value="settings">
+						<Tabs.Trigger value="settings" disabled={!viewer.loaded}>
 							{#snippet child({ props })}
 								<div class="tab">
 									<button class="btn-reset" {...props}>Settings</button>
 								</div>
 							{/snippet}
 						</Tabs.Trigger>
-						<Tabs.Trigger value="extras">
+						<Tabs.Trigger value="extras" disabled={!viewer.loaded}>
 							{#snippet child({ props })}
 								<div class="tab">
 									<button class="btn-reset" {...props}>Extras</button>
@@ -187,7 +187,7 @@
 								</div>
 							{/snippet}
 						</Tabs.Trigger>
-						<Tabs.Trigger value="export">
+						<Tabs.Trigger value="export" disabled={!viewer.loaded}>
 							{#snippet child({ props })}
 								<div class="tab">
 									<button class="btn-reset" {...props}>Export</button>
