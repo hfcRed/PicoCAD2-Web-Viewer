@@ -107,6 +107,20 @@
 		>PicoCAD2-Web</a
 	>, a JavaScript library for rendering PicoCAD2 models in the browser.
 </p>
+<p>
+	Buy PicoCAD 2 on
+	<a
+		href="https://store.steampowered.com/app/3675940/picoCAD_2/"
+		target="_blank"
+		rel="noopener noreferrer"
+		>Steam
+	</a>
+	or on
+	<a href="https://johanpeitz.itch.io/picocad2/" target="_blank" rel="noopener noreferrer">
+		itch.io
+	</a>, or visit the
+	<a href="https://picocad.net/" target="_blank" rel="noopener noreferrer">PicoCAD website</a>.
+</p>
 
 <div class="credits">
 	<small
