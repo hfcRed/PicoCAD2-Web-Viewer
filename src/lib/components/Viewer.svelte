@@ -185,6 +185,7 @@
 	}
 
 	.canvas-container {
+		background-color: var(--pico-initial-background-color);
 		position: sticky;
 		top: 2rem;
 		left: 0;
@@ -220,6 +221,7 @@
 	}
 
 	.stats {
+		padding-bottom: 0.5rem;
 		display: flex;
 		gap: 0.5rem;
 
