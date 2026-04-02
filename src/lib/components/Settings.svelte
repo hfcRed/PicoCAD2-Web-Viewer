@@ -226,7 +226,7 @@
 		<NumericControl
 			label="Time"
 			min={0}
-			max={4}
+			max={viewer.animationDuration}
 			step={0.01}
 			bind:value={
 				() => viewer.settings.animation.time,

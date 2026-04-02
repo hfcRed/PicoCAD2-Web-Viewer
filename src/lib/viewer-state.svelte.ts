@@ -22,6 +22,7 @@ interface Gif {
 class Viewer {
 	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
 	extras = $state<Required<ExtrasOptions>>({ ...DEFAULT_EXTRAS });
+	animationDuration = $state(0);
 	stats = $state<Stats>({ drawCalls: 0, polyCount: 0, fps: 0 });
 	loaded = $state(false);
 	name = $state('untitled');
@@ -118,6 +119,7 @@ class Viewer {
 			const { rotation, tilt, distance } = CAMERA_LIMITS;
 
 			this.settings.animation.time = this.pico.animation.time;
+			this.animationDuration = this.pico.modelInfo?.animationDuration ?? 0;
 			this.settings.camera = {
 				omega: ((this.pico.camera.omega % rotation.max) + rotation.max) % rotation.max,
 				theta: Math.max(tilt.min, Math.min(tilt.max, this.pico.camera.theta)),
