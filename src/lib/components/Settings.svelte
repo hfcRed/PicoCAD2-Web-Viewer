@@ -5,6 +5,10 @@
 
 	let customBackground = $state(!!viewer.settings.backgroundColor);
 	let lastBackgroundColor = $state(viewer.settings.backgroundColor);
+	let transparentBackground = $state(false);
+
+	const backgroundColorHex = () =>
+		lastBackgroundColor ? rgbToHex(lastBackgroundColor) : '#000000';
 
 	function handleBackgroundToggle(e: Event) {
 		const checked = (e.currentTarget as HTMLInputElement).checked;
@@ -15,6 +19,23 @@
 		} else {
 			viewer.update((pico) => (pico.backgroundColor = lastBackgroundColor));
 		}
+	}
+
+	function handleBackgroundColorChange(hex: string) {
+		const rgb = hexToRGB(hex);
+		viewer.update((pico) => (pico.backgroundColor = rgb));
+		lastBackgroundColor = rgb;
+
+		const transparentColor = viewer.pico.modelInfo?.transparentColor;
+		transparentBackground = !!transparentColor && rgb.every((c, i) => c === transparentColor[i]);
+	}
+
+	function handleTransparentToggle(v: boolean) {
+		transparentBackground = v;
+		const transparentColor = viewer.pico.modelInfo?.transparentColor;
+		if (!transparentColor) return;
+		viewer.update((pico) => (pico.backgroundColor = v ? transparentColor : lastBackgroundColor));
+		lastBackgroundColor = v ? transparentColor : lastBackgroundColor;
 	}
 
 	function handleTagInput(rawValue: string, side: 'left' | 'right') {
@@ -155,17 +176,15 @@
 		</label>
 	</legend>
 	{#if customBackground}
-		<input
-			type="color"
-			bind:value={
-				() => (lastBackgroundColor ? rgbToHex(lastBackgroundColor) : '#000000'),
-				(v: string) => {
-					const rgb = hexToRGB(v);
-					viewer.update((pico) => (pico.backgroundColor = rgb));
-					lastBackgroundColor = rgb;
-				}
-			}
-		/>
+		<input type="color" bind:value={backgroundColorHex, handleBackgroundColorChange} />
+		<label>
+			<input
+				type="checkbox"
+				role="switch"
+				bind:checked={() => transparentBackground, handleTransparentToggle}
+			/>
+			Transparent Background
+		</label>
 	{/if}
 </fieldset>
 
