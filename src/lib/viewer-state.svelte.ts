@@ -136,6 +136,21 @@ class Viewer {
 		this.updateState();
 	}
 
+	loadEmbedState(state: PicoCAD2ViewerState) {
+		this.pico.setState(state);
+		this.pico.stopRenderLoop();
+		this.pico.disableCameraControls();
+
+		this.pico.startRenderLoop(false);
+		this.pico.enableCameraControls({
+			spinInertiaFactor: 0.95,
+			useFixedOnInteract: { enabled: true, delayBeforeRestore: 2000, restoreTime: 1000 }
+		});
+
+		this.loaded = true;
+		this.updateState();
+	}
+
 	update(fn: (pico: PicoCAD2Viewer) => void) {
 		if (!this.loaded) return;
 		fn(this.pico);

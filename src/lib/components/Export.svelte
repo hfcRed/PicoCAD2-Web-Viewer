@@ -25,6 +25,7 @@
 	let selectedScale = $state(scales[3].value);
 
 	let generatedLink = $state<string | null>('');
+	let embedLink = $state<string | null>('');
 	let currentState = $state<string | null>('');
 
 	function handleSelection() {
@@ -33,7 +34,7 @@
 		);
 	}
 
-	function generateLink() {
+	function generateLinks() {
 		const param = compressState(viewer.getState());
 		if (!param || param.length > 20000) {
 			generatedLink = null;
@@ -41,6 +42,8 @@
 		}
 
 		generatedLink = `${window.location.origin}${window.location.pathname}?state=${param}`;
+		embedLink = `<iframe width="512" height="512" src="${generatedLink}&embed=true" frameborder="0" allowfullscreen></iframe>`;
+		console.log(`${generatedLink}&embed=true`);
 	}
 
 	function copyData(data: unknown) {
@@ -54,6 +57,7 @@
 		void viewer.extras;
 
 		generatedLink = '';
+		embedLink = '';
 		currentState = '';
 	});
 </script>
@@ -100,7 +104,7 @@
 	</legend>
 	<input type="text" readonly value={generatedLink} />
 	<div class="grid">
-		<button onclick={() => generateLink()}>Generate</button>
+		<button onclick={() => generateLinks()}>Generate</button>
 		<button disabled={!generatedLink} onclick={() => copyData(generatedLink)}>Copy</button>
 	</div>
 	{#if generatedLink === null}
@@ -130,25 +134,17 @@
 				</div>
 			</fieldset>
 		</Dialog>
-		<Dialog buttonText="Compressed" title="Export Compressed Viewer State">
+		<Dialog buttonText="Embed" title="Iframe Embed Code">
 			<p>
-				The current state of the viewer, compressed using LZString's <code
-					>compressToEncodedURIComponent()</code
-				>
-				function. This is mostly for internal usage, but can be useful if you want to store models to
-				a database or share them in a more compact form.
+				An iframe embed code with the current state of the viewer encoded in the URL. This is ideal
+				for embedding your model on websites, blogs, or sharing it with others without them needing
+				to use the PicoCAD2-Web library directly.
 			</p>
 			<fieldset>
-				<textarea
-					class="state-text"
-					value={currentState ? compressState(JSON.parse(currentState)) : ''}
-					readonly
-				></textarea>
+				<textarea class="state-text" value={embedLink} readonly></textarea>
 				<div class="grid">
-					<button onclick={() => (currentState = JSON.stringify(viewer.getState(), null, 2))}
-						>Get State</button
-					>
-					<button disabled={!currentState} onclick={() => copyData(currentState)}>Copy</button>
+					<button onclick={() => generateLinks()}>Get Embed</button>
+					<button disabled={!embedLink} onclick={() => copyData(embedLink)}>Copy</button>
 				</div>
 			</fieldset>
 		</Dialog>

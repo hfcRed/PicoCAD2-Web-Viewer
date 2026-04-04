@@ -1,6 +1,28 @@
 import { deflateRaw, inflateRaw } from 'pako';
 import { encode, decode } from '@msgpack/msgpack';
 import type { PicoCAD2ViewerState } from 'picocad2-web';
+import { viewer } from './viewer-state.svelte';
+
+export function attachViewer(e: HTMLCanvasElement) {
+	viewer.init(e);
+
+	const urlParams = new URLSearchParams(window.location.search);
+	const stateParam = urlParams.get('state');
+	const embedParam = urlParams.get('embed');
+	if (!stateParam) return;
+
+	const decompressed = decompressState(stateParam);
+	if (!decompressed) return;
+
+	if (embedParam && stateParam) {
+		viewer.loadEmbedState(decompressed);
+		return;
+	}
+
+	if (stateParam) {
+		viewer.loadModel({ state: decompressed });
+	}
+}
 
 export function hexToRGB(s: string) {
 	return [s.slice(1, 3), s.slice(3, 5), s.slice(5, 7)].map((s) => parseInt(s, 16) / 255) as [
