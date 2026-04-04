@@ -143,8 +143,7 @@ class Viewer {
 
 		this.pico.startRenderLoop(false);
 		this.pico.enableCameraControls({
-			spinInertiaFactor: 0.95,
-			useFixedOnInteract: { enabled: true, delayBeforeRestore: 2000, restoreTime: 1000 }
+			useFixedOnInteract: { enabled: true, delayBeforeRestore: 1000, restoreTime: 1000 }
 		});
 
 		this.loaded = true;
