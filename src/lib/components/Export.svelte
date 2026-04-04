@@ -4,9 +4,13 @@
 	import Dialog from '$lib/components/Dialog.svelte';
 
 	const resolutions = [
-		{ label: '192x192', value: 192 },
+		{ label: '2048x2048', value: 2048 },
+		{ label: '1024x1024', value: 1024 },
+		{ label: '512x512', value: 512 },
+		{ label: '256x256', value: 256 },
 		{ label: '128x128', value: 128 },
-		{ label: '64x64', value: 64 }
+		{ label: '64x64', value: 64 },
+		{ label: '32x32', value: 32 }
 	] as const;
 
 	const scales = [
@@ -17,7 +21,7 @@
 		{ label: '5x', value: 5 }
 	] as const;
 
-	let selectedResolution = $state(resolutions[1].value);
+	let selectedResolution = $state(resolutions[4].value);
 	let selectedScale = $state(scales[3].value);
 
 	let generatedLink = $state<string | null>('');
@@ -80,6 +84,12 @@
 		disabled={viewer.gif.recording}
 		type="submit">{viewer.gif.recording ? `${viewer.gif.progress}%` : 'Start'}</button
 	>
+	{#if selectedResolution >= 512}
+		<p class="error record-error">
+			Recording at resolutions at or above 512x512 may cause performance issues, crashes, or
+			unwanted results if the scale is too high.
+		</p>
+	{/if}
 </fieldset>
 
 <hr />
@@ -158,6 +168,12 @@
 	.record {
 		grid-row: 2;
 		grid-column: auto / span 2;
+	}
+
+	.record-error {
+		grid-row: 3;
+		grid-column: auto / span 2;
+		margin-top: calc(var(--pico-typography-spacing-vertical) * -1);
 	}
 
 	.error {
