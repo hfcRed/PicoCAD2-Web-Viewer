@@ -1,4 +1,5 @@
-import LZString from 'lz-string';
+import { deflateRaw, inflateRaw } from 'pako';
+import { encode, decode } from '@msgpack/msgpack';
 import type { PicoCAD2ViewerState } from 'picocad2-web';
 
 export function hexToRGB(s: string) {
@@ -23,15 +24,19 @@ export function rgbToHex(c: [number, number, number]): string {
 }
 
 export function compressState(state: PicoCAD2ViewerState) {
-	return LZString.compressToEncodedURIComponent(JSON.stringify(state));
+	return btoa(String.fromCharCode(...deflateRaw(encode(state), { level: 9 })))
+		.replace(/\+/g, '-')
+		.replace(/\//g, '_')
+		.replace(/=+$/, '');
 }
 
 export function decompressState(compressed: string) {
 	try {
-		const json = LZString.decompressFromEncodedURIComponent(compressed);
-		if (!json) throw new Error('Failed to decompress state');
+		const base64 = compressed.replace(/-/g, '+').replace(/_/g, '/');
+		const data = inflateRaw(Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)));
+		if (!data) throw new Error('Failed to decompress state');
 
-		return JSON.parse(json) as PicoCAD2ViewerState;
+		return decode(data) as PicoCAD2ViewerState;
 	} catch (e) {
 		console.error('Error decompressing state:', e);
 		return null;

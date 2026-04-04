@@ -3,6 +3,7 @@
 	import { compressState, decompressState } from '../utils';
 	import { viewer } from '../viewer-state.svelte';
 	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 
 	interface SavedModel {
 		state: string;
@@ -57,6 +58,17 @@
 		savedModels.current.splice(index, 1);
 		if (savedModels.current.length === 0) savedModels.disconnect();
 	}
+
+	// Clear saved models if compressed state format changes
+	onMount(() => {
+		const currentVersion = '1';
+		const oldVersion = localStorage.getItem('version');
+
+		if (!oldVersion || oldVersion !== currentVersion) {
+			savedModels.current = [...Object.values(defaultModels)];
+			localStorage.setItem('version', currentVersion);
+		}
+	});
 </script>
 
 <div class="images-container">
