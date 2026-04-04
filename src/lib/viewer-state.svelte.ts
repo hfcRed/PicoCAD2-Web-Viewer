@@ -93,7 +93,7 @@ class Viewer {
 			if (state) {
 				this.pico.setState(state);
 			} else if (model) {
-				this.pico.load(model, true);
+				this.pico.load(model);
 			}
 		} catch (e) {
 			console.error('Failed to load model:', e);
