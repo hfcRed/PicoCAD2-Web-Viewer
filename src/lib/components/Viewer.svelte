@@ -42,12 +42,23 @@
 		}
 	}
 
+	function loadFromString(text: string) {
+		const json = JSON.parse(text || '{}');
+		const isState = !!json.source;
+
+		if (isState) {
+			viewer.loadModel({ state: json });
+		} else {
+			viewer.loadModel({ model: text });
+		}
+	}
+
 	function handleFile(file: File) {
 		const reader = new FileReader();
 		reader.onload = (event) => {
 			const content = event.target?.result;
 			if (typeof content === 'string') {
-				viewer.loadModel({ model: content });
+				loadFromString(content);
 			}
 		};
 		reader.readAsText(file);
@@ -70,7 +81,7 @@
 		if (file) return handleFile(file);
 
 		const text = e.clipboardData?.getData('text/plain');
-		if (text) viewer.loadModel({ model: text });
+		if (text) loadFromString(text);
 	}
 
 	function handleDrop(e: DragEvent) {
@@ -80,7 +91,7 @@
 		if (file) return handleFile(file);
 
 		const text = e.dataTransfer?.getData('text/plain');
-		if (text) viewer.loadModel({ model: text });
+		if (text) loadFromString(text);
 	}
 </script>
 
