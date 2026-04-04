@@ -140,6 +140,13 @@ class Viewer {
 		if (!this.loaded) return;
 		fn(this.pico);
 		this.updateState();
+
+		this.pico.camera.initFromState({
+			omega: this.settings.camera.omega,
+			theta: this.settings.camera.theta,
+			distanceToTarget: this.settings.camera.distanceToTarget,
+			target: new Float32Array(this.settings.camera.target)
+		});
 	}
 
 	private updateState() {
