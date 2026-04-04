@@ -233,9 +233,11 @@ class Viewer {
 		this.recordingCancelled = false;
 
 		const frozenOffset = this.pico.camera.omegaOffset;
+		const frameDt = 1 / fps;
 
 		for (let i = 0; i < totalFrames; i++) {
 			if (this.recordingCancelled) break;
+			this.pico.advanceTime(frameDt);
 
 			const progress = i / totalFrames;
 
