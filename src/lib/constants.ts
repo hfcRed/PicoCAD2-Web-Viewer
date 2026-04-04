@@ -33,6 +33,17 @@ export const DEFAULT_SETTINGS = {
 		distanceToTarget: 0,
 		target: [0, 0, 0],
 		zoom: 0
+	},
+	bookmark: {
+		omega: 0,
+		theta: 0,
+		distanceToTarget: 0,
+		target: [0, 0, 0]
+	},
+	resolution: {
+		width: 128,
+		height: 128,
+		scale: 4
 	}
 } as const satisfies ViewerSettings;
 

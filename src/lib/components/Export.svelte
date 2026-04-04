@@ -21,18 +21,9 @@
 		{ label: '5x', value: 5 }
 	] as const;
 
-	let selectedResolution = $state(resolutions[4].value);
-	let selectedScale = $state(scales[3].value);
-
 	let generatedLink = $state<string | null>('');
 	let embedLink = $state<string | null>('');
 	let currentState = $state<string | null>('');
-
-	function handleSelection() {
-		viewer.update((pico) =>
-			pico.setResolution(selectedResolution, selectedResolution, selectedScale)
-		);
-	}
 
 	function generateLinks() {
 		const param = compressState(viewer.getState());
@@ -67,17 +58,34 @@
 	</legend>
 	<label>
 		Resolution
-		<select bind:value={selectedResolution} onchange={() => handleSelection()}>
+		<select
+			bind:value={
+				() => viewer.settings.resolution.width,
+				(v) => viewer.update((pico) => pico.setResolution(v, v, viewer.settings.resolution.scale))
+			}
+		>
 			{#each resolutions as { label, value } (value)}
-				<option {value} selected={value === selectedResolution}>{label}</option>
+				<option {value} selected={value === viewer.settings.resolution.width}>{label}</option>
 			{/each}
 		</select>
 	</label>
 	<label>
 		Scale
-		<select bind:value={selectedScale} onchange={() => handleSelection()}>
+		<select
+			bind:value={
+				() => viewer.settings.resolution.scale,
+				(v) =>
+					viewer.update((pico) =>
+						pico.setResolution(
+							viewer.settings.resolution.width,
+							viewer.settings.resolution.height,
+							v
+						)
+					)
+			}
+		>
 			{#each scales as { label, value } (value)}
-				<option {value} selected={value === selectedScale}>{label}</option>
+				<option {value} selected={value === viewer.settings.resolution.scale}>{label}</option>
 			{/each}
 		</select>
 	</label>
@@ -87,7 +95,7 @@
 		disabled={viewer.gif.recording}
 		type="submit">{viewer.gif.recording ? `${viewer.gif.progress}%` : 'Start'}</button
 	>
-	{#if selectedResolution >= 512}
+	{#if viewer.settings.resolution.width >= 512}
 		<p class="error record-error">
 			Recording at resolutions at or above 512x512 may cause performance issues, crashes, or
 			unwanted results if the scale is too high.
