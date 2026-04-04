@@ -91,14 +91,14 @@ class Viewer {
 		const currentState = this.loaded ? this.pico.getState() : null;
 		try {
 			if (state) {
-				this.pico.setState(state);
+				this.pico.setState(state, true);
 			} else if (model) {
-				this.pico.load(model);
+				this.pico.load(model, true);
 			}
 		} catch (e) {
 			console.error('Failed to load model:', e);
 			if (!currentState) return;
-			this.pico.setState(currentState);
+			this.pico.setState(currentState, true);
 		}
 
 		let lastTime = performance.now();
@@ -137,7 +137,7 @@ class Viewer {
 	}
 
 	loadEmbedState(state: PicoCAD2ViewerState) {
-		this.pico.setState(state);
+		this.pico.setState(state, true);
 		this.pico.stopRenderLoop();
 		this.pico.disableCameraControls();
 
