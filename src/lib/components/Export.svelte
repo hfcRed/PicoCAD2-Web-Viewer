@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { compressState } from '../utils';
+	import { compressState, rgbToHex } from '../utils';
 	import { viewer } from '../viewer-state.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 
@@ -42,8 +42,7 @@
 		}
 
 		generatedLink = `${window.location.origin}${window.location.pathname}?state=${param}`;
-		embedLink = `<iframe width="512" height="512" src="${generatedLink}&embed=true" frameborder="0" allowfullscreen></iframe>`;
-		console.log(`${generatedLink}&embed=true`);
+		embedLink = `<iframe width="512" height="512" src="${generatedLink}&embed=true&background=${rgbToHex(viewer.settings.backgroundColor ?? [0, 0, 0]).replace('#', '')}" frameborder="0" allowfullscreen></iframe>`;
 	}
 
 	function copyData(data: unknown) {

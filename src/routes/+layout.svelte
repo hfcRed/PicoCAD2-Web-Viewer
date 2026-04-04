@@ -22,18 +22,15 @@
 <style>
 	:global {
 		html:has(.embed) {
-			background: transparent;
 			overflow: hidden;
 
 			body {
-				background: transparent;
 				overflow: hidden;
 			}
 		}
 	}
 
 	canvas {
-		background: transparent;
 		aspect-ratio: 1 / 1;
 		width: 100% !important;
 		height: auto !important;
