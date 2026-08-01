@@ -6,6 +6,7 @@
 	import Extras from './Extras.svelte';
 	import Models from './Models.svelte';
 	import Export from './Export.svelte';
+	import LoadDialog from './LoadDialog.svelte';
 	import { attachViewer } from '$lib/utils';
 
 	let tab = $state('models');
@@ -32,9 +33,9 @@
 		const isState = !!json.source;
 
 		if (isState) {
-			viewer.loadModel({ state: json });
+			viewer.requestLoad({ state: json });
 		} else {
-			viewer.loadModel({ model: text });
+			viewer.requestLoad({ model: text });
 		}
 	}
 
@@ -88,6 +89,8 @@
 	ondragover={(e: Event) => e.preventDefault()}
 	ondragleave={(e: Event) => e.preventDefault()}
 />
+
+<LoadDialog />
 
 <div class="grid-container">
 	<div class="canvas-container">

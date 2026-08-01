@@ -19,6 +19,12 @@ interface Gif {
 	initialRotation: number;
 }
 
+interface LoadRequest {
+	model?: string;
+	state?: PicoCAD2ViewerState;
+	name?: string;
+}
+
 class Viewer {
 	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
 	extras = $state<Required<ExtrasOptions>>({ ...DEFAULT_EXTRAS });
@@ -34,6 +40,8 @@ class Viewer {
 		progress: 0,
 		initialRotation: 0
 	});
+
+	pendingLoad = $state<LoadRequest | null>(null);
 
 	context!: PicoCAD2Context;
 	pico!: PicoCAD2Viewer;
@@ -85,7 +93,41 @@ class Viewer {
 		};
 	}
 
-	loadModel({ model, state }: { model?: string; state?: PicoCAD2ViewerState }) {
+	requestLoad(request: LoadRequest) {
+		if (!this.loaded) {
+			this.applyLoad(request, false);
+			return;
+		}
+
+		this.pendingLoad = request;
+	}
+
+	confirmPendingLoad(keepSettings: boolean) {
+		if (!this.pendingLoad) return;
+
+		const request = this.pendingLoad;
+		this.pendingLoad = null;
+		this.applyLoad(request, keepSettings);
+	}
+
+	cancelPendingLoad() {
+		this.pendingLoad = null;
+	}
+
+	private applyLoad(request: LoadRequest, keepSettings: boolean) {
+		this.loadModel({ model: request.model, state: request.state, keepSettings });
+		if (request.name) this.name = request.name;
+	}
+
+	loadModel({
+		model,
+		state,
+		keepSettings = false
+	}: {
+		model?: string;
+		state?: PicoCAD2ViewerState;
+		keepSettings?: boolean;
+	}) {
 		this.stopGIFRecording();
 
 		const currentState = this.loaded ? this.pico.getState() : null;
@@ -94,6 +136,19 @@ class Viewer {
 				this.pico.setState(state);
 			} else if (model) {
 				this.pico.load(model);
+			}
+
+			if (keepSettings && currentState) {
+				const newState = this.pico.getState();
+				this.pico.setState({
+					source: newState.source,
+					settings: {
+						...currentState.settings,
+						animation: { ...currentState.settings.animation, time: 0 },
+						bookmark: newState.settings.bookmark
+					},
+					extras: currentState.extras
+				});
 			}
 		} catch (e) {
 			console.error('Failed to load model:', e);

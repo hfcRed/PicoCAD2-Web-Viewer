@@ -44,8 +44,7 @@
 		const state = decompressState(model.state);
 		if (!state) return;
 
-		viewer.loadModel({ state });
-		viewer.name = model.name;
+		viewer.requestLoad({ state, name: model.name });
 	}
 
 	function deleteModel() {
