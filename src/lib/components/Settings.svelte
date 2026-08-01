@@ -22,12 +22,18 @@
 	}
 
 	function handleBackgroundColorChange(hex: string) {
-		const rgb = hexToRGB(hex);
-		viewer.update((pico) => (pico.backgroundColor = rgb));
-		lastBackgroundColor = rgb;
+		let rgb = hexToRGB(hex);
 
 		const transparentColor = viewer.pico.modelInfo?.transparentColor;
-		transparentBackground = !!transparentColor && rgb.every((c, i) => c === transparentColor[i]);
+		transparentBackground =
+			!!transparentColor &&
+			rgb.every((c, i) => Math.fround(c) === Math.fround(transparentColor[i]));
+		if (transparentBackground && transparentColor) {
+			rgb = [...transparentColor];
+		}
+
+		viewer.update((pico) => (pico.backgroundColor = rgb));
+		lastBackgroundColor = rgb;
 	}
 
 	function handleTransparentToggle(v: boolean) {
