@@ -5,8 +5,12 @@
 </script>
 
 <p>
-	Effects apply in the same order they are listed. Disabling <code>Model Only</code> on any effect will
-	apply all following effects to the entire screen as well.
+	Effects apply in the same order they are listed. With an opaque background, disabling
+	<code>Model Only</code> on any effect applies all following effects to the entire screen as well.
+	With a transparent background, following effects extend only to the pixels earlier effects painted
+	(like bloom glow). Fully transparent areas stay untouched. Effects can also produce partially
+	transparent pixels, which the GIF format does not support, so those pixels will not appear in
+	exported GIFs. Keep <code>Model Only</code> enabled if you need clean GIF exports.
 </p>
 
 <fieldset>
@@ -154,7 +158,7 @@
 		<NumericControl
 			label="Near"
 			min={0}
-			max={10}
+			max={100}
 			step={0.1}
 			bind:value={
 				() => viewer.extras.depthFog.near!,
@@ -324,9 +328,9 @@
 		/>
 		<NumericControl
 			label="Hue"
-			min={-1}
-			max={1}
-			step={0.01}
+			min={-180}
+			max={180}
+			step={1}
 			bind:value={
 				() => viewer.extras.colorGrading.hue!,
 				(v) => viewer.update((pico) => (pico.extras.colorGrading.hue = v))
@@ -1196,7 +1200,7 @@
 		<NumericControl
 			label="Roundness"
 			min={0}
-			max={2}
+			max={1}
 			step={0.01}
 			bind:value={
 				() => viewer.extras.vignette.roundness!,
