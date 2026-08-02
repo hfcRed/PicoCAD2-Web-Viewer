@@ -8,6 +8,7 @@
 		{ label: '1024x1024', value: 1024 },
 		{ label: '512x512', value: 512 },
 		{ label: '256x256', value: 256 },
+		{ label: '192x192', value: 192 },
 		{ label: '128x128', value: 128 },
 		{ label: '64x64', value: 64 },
 		{ label: '32x32', value: 32 }
