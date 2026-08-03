@@ -25,7 +25,8 @@ export const DEFAULT_SETTINGS = {
 		speed: 0,
 		time: 0,
 		playing: false,
-		loop: false
+		loop: false,
+		loops: 1
 	},
 	camera: {
 		omega: 0,

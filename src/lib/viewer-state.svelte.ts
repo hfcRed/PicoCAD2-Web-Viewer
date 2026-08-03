@@ -269,8 +269,9 @@ class Viewer {
 		};
 
 		const fps = 30;
+		const loops = Math.max(1, this.pico.animation.loops);
 		const duration = this.pico.animation.playing
-			? animationDuration / this.pico.animation.speed
+			? (animationDuration * loops) / this.pico.animation.speed
 			: this.pico.cameraModeSpeed;
 		const totalFrames = Math.ceil(fps * duration);
 		const delay = Math.round((1 / fps) * 1000);
@@ -318,7 +319,7 @@ class Viewer {
 			const progress = i / totalFrames;
 
 			if (this.settings.animation.playing) {
-				this.pico.animation.setTime(progress * animationDuration);
+				this.pico.animation.setTime((progress * animationDuration * loops) % animationDuration);
 			} else {
 				const simulatedOffset = this.computeSimulatedOffset(progress, cameraMode, direction);
 				this.pico.camera.omega = savedOmega - frozenOffset + simulatedOffset;

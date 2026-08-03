@@ -258,7 +258,7 @@
 				(v) => viewer.update((pico) => (pico.animation.time = v))
 			}
 		/>
-		<label>
+		<label class="form-margin">
 			<input
 				type="checkbox"
 				role="switch"
@@ -269,5 +269,15 @@
 			/>
 			Loop
 		</label>
+		<NumericControl
+			label="GIF loops"
+			min={1}
+			max={9}
+			step={1}
+			bind:value={
+				() => viewer.settings.animation.loops,
+				(v) => viewer.update((pico) => (pico.animation.loops = v))
+			}
+		/>
 	{/if}
 </fieldset>
