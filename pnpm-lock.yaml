@@ -24,8 +24,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       picocad2-web:
-        specifier: 1.4.0-beta.0
-        version: 1.4.0-beta.0
+        specifier: 1.4.0-beta.1
+        version: 1.4.0-beta.1
       runed:
         specifier: ^0.37.1
         version: 0.37.1(@sveltejs/kit@2.55.0(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.55.0)(vite@7.3.1(@types/node@22.19.15)))(svelte@5.55.0)(typescript@5.9.3)(vite@7.3.1(@types/node@22.19.15)))(svelte@5.55.0)
@@ -1408,8 +1408,8 @@ packages:
   pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
 
-  picocad2-web@1.4.0-beta.0:
-    resolution: {integrity: sha512-T2Xoqtgrrg7GQhcWdIORvLGm+3rGOjTv8IOrjP+c8Tu8VSXRzhIQP19QFaTb2DPL0frnE7sRncfsBk4TO2tjbQ==}
+  picocad2-web@1.4.0-beta.1:
+    resolution: {integrity: sha512-WZzacJOpgWfbkho4sRUGNgHgrIO8RKcVczp80UZqL97m6fFmuGNoYgYskCMGZ5+RmOEtuNN7IZZLA95W6/Wtag==}
     engines: {node: '>=18.0.0'}
 
   picocolors@1.1.1:
@@ -2819,7 +2819,7 @@ snapshots:
 
   pathe@2.0.3: {}
 
-  picocad2-web@1.4.0-beta.0:
+  picocad2-web@1.4.0-beta.1:
     dependencies:
       gl-matrix: 3.4.4
       twgl.js: 7.0.0
