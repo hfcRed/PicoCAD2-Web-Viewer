@@ -6,11 +6,15 @@
 
 <p>
 	Effects apply in the same order they are listed. With an opaque background, disabling
-	<code>Model Only</code> on any effect applies all following effects to the entire screen as well.
-	With a transparent background, following effects extend only to the pixels earlier effects painted
-	(like bloom glow). Fully transparent areas stay untouched. Effects can also produce partially
-	transparent pixels, which the GIF format does not support, so those pixels will not appear in
-	exported GIFs. Keep <code>Model Only</code> enabled if you need clean GIF exports.
+	<code>Model Only</code> on any effect applies all following effects to the entire screen as well. With
+	a transparent background, following effects only apply to the pixels earlier effects painted (like bloom
+	glow). Fully transparent areas stay untouched.
+</p>
+<p>
+	Effects can also produce partially transparent pixels if the background is transparent, which the
+	GIF format does not support, so those pixels will not appear in exported GIFs. Keep <code
+		>Model Only</code
+	> enabled if you need clean GIF exports with a transparent background.
 </p>
 
 <fieldset>
@@ -1230,3 +1234,9 @@
 		</label>
 	{/if}
 </fieldset>
+
+<style>
+	code {
+		padding-block: 0.15rem;
+	}
+</style>
