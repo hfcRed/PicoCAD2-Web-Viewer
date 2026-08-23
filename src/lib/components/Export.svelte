@@ -43,6 +43,20 @@
 		navigator.clipboard.writeText(data);
 	}
 
+	function toggleCustomResolution() {
+		viewer.update((pico) => {
+			if (viewer.usingCustomResolution) {
+				pico.setResolution(
+					viewer.settings.resolution.width,
+					viewer.settings.resolution.height,
+					viewer.settings.resolution.scale
+				);
+			} else {
+				pico.setResolution(128, 128, viewer.settings.resolution.scale);
+			}
+		});
+	}
+
 	$effect(() => {
 		void viewer.settings;
 		void viewer.extras;
@@ -53,49 +67,100 @@
 	});
 </script>
 
-<fieldset class="grid gif">
+<fieldset>
 	<legend>
 		<h4>Record Gif</h4>
 	</legend>
-	<label>
-		Resolution
-		<select
-			bind:value={
-				() => viewer.settings.resolution.width,
-				(v) => viewer.update((pico) => pico.setResolution(v, v, viewer.settings.resolution.scale))
-			}
-		>
-			{#each resolutions as { label, value } (value)}
-				<option {value} selected={value === viewer.settings.resolution.width}>{label}</option>
-			{/each}
-		</select>
+	<label class="form-margin">
+		<input
+			type="checkbox"
+			role="switch"
+			bind:checked={viewer.usingCustomResolution}
+			onchange={toggleCustomResolution}
+		/>
+		Custom resolution
 	</label>
-	<label>
-		Scale
-		<select
-			bind:value={
-				() => viewer.settings.resolution.scale,
-				(v) =>
-					viewer.update((pico) =>
-						pico.setResolution(
-							viewer.settings.resolution.width,
-							viewer.settings.resolution.height,
-							v
+	<div class="grid gif">
+		{#if viewer.usingCustomResolution}
+			<label>
+				Width
+				<input
+					class="no-margin"
+					type="number"
+					min="1"
+					max="2048"
+					bind:value={viewer.settings.resolution.width}
+					onchange={() =>
+						viewer.update((pico) =>
+							pico.setResolution(
+								viewer.settings.resolution.width,
+								viewer.settings.resolution.height,
+								viewer.settings.resolution.scale
+							)
+						)}
+				/>
+			</label>
+			<label>
+				Height
+				<input
+					class="no-margin"
+					type="number"
+					min="1"
+					max="2048"
+					bind:value={viewer.settings.resolution.height}
+					onchange={() =>
+						viewer.update((pico) =>
+							pico.setResolution(
+								viewer.settings.resolution.width,
+								viewer.settings.resolution.height,
+								viewer.settings.resolution.scale
+							)
+						)}
+				/>
+			</label>
+		{:else}
+			<label>
+				Resolution
+				<select
+					bind:value={
+						() => viewer.settings.resolution.width,
+						(v) =>
+							viewer.update((pico) => pico.setResolution(v, v, viewer.settings.resolution.scale))
+					}
+				>
+					{#each resolutions as { label, value } (value)}
+						<option {value} selected={value === viewer.settings.resolution.width}>{label}</option>
+					{/each}
+				</select>
+			</label>
+		{/if}
+		<label>
+			Scale
+			<select
+				bind:value={
+					() => viewer.settings.resolution.scale,
+					(v) =>
+						viewer.update((pico) =>
+							pico.setResolution(
+								viewer.settings.resolution.width,
+								viewer.settings.resolution.height,
+								v
+							)
 						)
-					)
-			}
+				}
+			>
+				{#each scales as { label, value } (value)}
+					<option {value} selected={value === viewer.settings.resolution.scale}>{label}</option>
+				{/each}
+			</select>
+		</label>
+		<button
+			class={{ 'custom-resolution': viewer.usingCustomResolution, record: true }}
+			onclick={() => viewer.startGIFRecording()}
+			disabled={viewer.gif.recording}
+			type="submit">{viewer.gif.recording ? `${viewer.gif.progress}%` : 'Start'}</button
 		>
-			{#each scales as { label, value } (value)}
-				<option {value} selected={value === viewer.settings.resolution.scale}>{label}</option>
-			{/each}
-		</select>
-	</label>
-	<button
-		class="record"
-		onclick={() => viewer.startGIFRecording()}
-		disabled={viewer.gif.recording}
-		type="submit">{viewer.gif.recording ? `${viewer.gif.progress}%` : 'Start'}</button
-	>
+	</div>
 	{#if viewer.settings.resolution.width >= 512}
 		<p class="error record-error">
 			Recording at resolutions at or above 512x512 may cause performance issues, crashes, or
@@ -169,9 +234,17 @@
 		}
 	}
 
+	.no-margin {
+		margin-bottom: 0;
+	}
+
 	.record {
 		grid-row: 2;
 		grid-column: auto / span 2;
+
+		&.custom-resolution {
+			grid-column: auto / span 3;
+		}
 	}
 
 	.record-error {

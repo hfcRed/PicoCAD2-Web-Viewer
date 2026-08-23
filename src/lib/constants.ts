@@ -45,7 +45,8 @@ export const DEFAULT_SETTINGS = {
 		width: 128,
 		height: 128,
 		scale: 4
-	}
+	},
+	maxFps: 0
 } as const satisfies ViewerSettings;
 
 export const DEFAULT_EXTRAS = {

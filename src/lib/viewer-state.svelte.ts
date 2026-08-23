@@ -32,6 +32,7 @@ class Viewer {
 	stats = $state<Stats>({ drawCalls: 0, polyCount: 0, fps: 0 });
 	loaded = $state(false);
 	name = $state('untitled');
+	usingCustomResolution = $state(false);
 
 	gif = $state<Gif>({
 		url: null,
@@ -56,7 +57,8 @@ class Viewer {
 		this.pico = new PicoCAD2Viewer({
 			canvas,
 			context: this.context,
-			resolution: { width: 128, height: 128, scale: 4 }
+			resolution: { width: 128, height: 128, scale: 4 },
+			maxFps: 0
 		});
 
 		this.setupWorker();
@@ -189,6 +191,12 @@ class Viewer {
 
 		this.loaded = true;
 		this.updateState();
+
+		if (this.settings.resolution.width !== this.settings.resolution.height) {
+			this.usingCustomResolution = true;
+		} else {
+			this.usingCustomResolution = false;
+		}
 	}
 
 	loadEmbedState(state: PicoCAD2ViewerState) {

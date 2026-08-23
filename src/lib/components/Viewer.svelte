@@ -92,21 +92,24 @@
 
 <LoadDialog />
 
-<div class="grid-container">
+<div class={{ 'grid-container': true, container: viewer.usingCustomResolution }}>
 	<div class="canvas-container">
 		<div class="canvas-wrapper">
-			<canvas {@attach attachViewer}></canvas>
+			<canvas class={{ 'custom-resolution': viewer.usingCustomResolution }} {@attach attachViewer}
+			></canvas>
 			{#if !viewer.loaded}
 				<small
 					>Drag and drop or copy and paste a model file or string to load it into the viewer</small
 				>
 			{/if}
 		</div>
-		<div class="stats">
-			<small>FPS: {viewer.stats.fps}</small>
-			<small>Draw Calls: {viewer.stats.drawCalls}</small>
-			<small>Poly Count: {viewer.stats.polyCount}</small>
-		</div>
+		{#if !viewer.usingCustomResolution}
+			<div class="stats">
+				<small>FPS: {viewer.stats.fps}</small>
+				<small>Draw Calls: {viewer.stats.drawCalls}</small>
+				<small>Poly Count: {viewer.stats.polyCount}</small>
+			</div>
+		{/if}
 	</div>
 	<Tabs.Root orientation="horizontal" bind:value={tab}>
 		<Tabs.List>
@@ -177,6 +180,12 @@
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
 
+		&.container {
+			position: fixed;
+			top: 10px;
+			right: 10px;
+		}
+
 		@media (max-width: 768px) {
 			grid-template-columns: 1fr;
 			padding: 0;
@@ -199,9 +208,18 @@
 			border: var(--pico-border-width) solid var(--pico-form-element-border-color);
 			border-radius: var(--pico-border-radius);
 			background-color: var(--pico-form-element-background-color);
+		}
+
+		canvas:not(.custom-resolution) {
 			aspect-ratio: 1 / 1;
 			width: 100% !important;
 			height: auto !important;
+		}
+
+		canvas.custom-resolution {
+			position: fixed;
+			top: 10px;
+			left: 10px;
 		}
 	}
 
