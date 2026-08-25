@@ -55,6 +55,10 @@ export const DEFAULT_EXTRAS = {
 		modelOnly: true,
 		color: [0, 0, 0]
 	},
+	colorCutout: {
+		enabled: false,
+		maskedColors: []
+	},
 	gradientOutline: {
 		enabled: false,
 		modelOnly: true,
@@ -71,7 +75,8 @@ export const DEFAULT_EXTRAS = {
 		near: 0,
 		far: 0,
 		density: 0,
-		mode: 'linear'
+		mode: 'linear',
+		maskedColors: []
 	},
 	edgeDetection: {
 		enabled: false,
@@ -79,7 +84,8 @@ export const DEFAULT_EXTRAS = {
 		threshold: 0,
 		lineColor: [0, 0, 0],
 		backgroundColor: [0, 0, 0],
-		blend: 0
+		blend: 0,
+		maskedColors: []
 	},
 	colorGrading: {
 		enabled: false,
@@ -87,7 +93,8 @@ export const DEFAULT_EXTRAS = {
 		brightness: 0,
 		contrast: 0,
 		saturation: 0,
-		hue: 0
+		hue: 0,
+		maskedColors: []
 	},
 	colorTint: {
 		enabled: false,
@@ -97,7 +104,8 @@ export const DEFAULT_EXTRAS = {
 		intensity: 0,
 		shadowColor: [0, 0, 0],
 		highlightColor: [0, 0, 0],
-		blend: 0
+		blend: 0,
+		maskedColors: []
 	},
 	posterization: {
 		enabled: false,
@@ -105,27 +113,31 @@ export const DEFAULT_EXTRAS = {
 		levels: 0,
 		channelLevels: [0, 0, 0],
 		gamma: 0,
-		colorBanding: false
+		colorBanding: false,
+		maskedColors: []
 	},
 	sharpen: {
 		enabled: false,
 		modelOnly: true,
 		strength: 0,
-		threshold: 0
+		threshold: 0,
+		maskedColors: []
 	},
 	bloom: {
 		enabled: false,
 		modelOnly: true,
 		threshold: 0,
 		intensity: 0,
-		blur: 0
+		blur: 0,
+		maskedColors: []
 	},
 	dithering: {
 		enabled: false,
 		modelOnly: true,
 		amount: 0,
 		blend: 0,
-		channelAmount: [0, 0, 0]
+		channelAmount: [0, 0, 0],
+		maskedColors: []
 	},
 	halftone: {
 		enabled: false,
@@ -133,20 +145,23 @@ export const DEFAULT_EXTRAS = {
 		dotSize: 0,
 		angle: 0,
 		blend: 0,
-		mode: 'dots'
+		mode: 'dots',
+		maskedColors: []
 	},
 	crt: {
 		enabled: false,
 		modelOnly: true,
 		curvature: 0,
-		scanlineIntensity: 0
+		scanlineIntensity: 0,
+		maskedColors: []
 	},
 	pixelation: {
 		enabled: false,
 		modelOnly: true,
 		pixelSize: 0,
 		shape: 'square',
-		blend: 0
+		blend: 0,
+		maskedColors: []
 	},
 	lensDistortion: {
 		enabled: false,
@@ -163,12 +178,14 @@ export const DEFAULT_EXTRAS = {
 		blueOffset: 0,
 		radialFalloff: 0,
 		centerX: 0,
-		centerY: 0
+		centerY: 0,
+		maskedColors: []
 	},
 	noise: {
 		enabled: false,
 		modelOnly: true,
-		amount: 0
+		amount: 0,
+		maskedColors: []
 	},
 	glitch: {
 		enabled: false,
@@ -177,7 +194,8 @@ export const DEFAULT_EXTRAS = {
 		speed: 0,
 		blockSize: 0,
 		rgbSplit: false,
-		lineShift: false
+		lineShift: false,
+		maskedColors: []
 	},
 	vignette: {
 		enabled: false,

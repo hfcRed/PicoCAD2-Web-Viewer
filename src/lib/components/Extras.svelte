@@ -2,6 +2,7 @@
 	import { viewer } from '../viewer-state.svelte';
 	import NumericControl from '$lib/components/NumericControl.svelte';
 	import { hexToRGB, rgbToHex } from '../utils';
+	import MaskSelector from './MaskSelector.svelte';
 </script>
 
 <p>
@@ -852,6 +853,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.pixelation.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.pixelation.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Pixel Size"
 			min={1}
