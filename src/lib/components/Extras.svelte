@@ -59,6 +59,27 @@
 <fieldset>
 	<legend>
 		<label class="form-collapse">
+			<h4>Cutout</h4>
+			<input
+				type="checkbox"
+				bind:checked={
+					() => viewer.extras.colorCutout.enabled!,
+					(v) => viewer.update((pico) => (pico.extras.colorCutout.enabled = v))
+				}
+			/>
+		</label>
+	</legend>
+	{#if viewer.extras.colorCutout.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.colorCutout.maskedColors = selectedColors))}
+		/>
+	{/if}
+</fieldset>
+<hr />
+<fieldset>
+	<legend>
+		<label class="form-collapse">
 			<h4>Gradient Outline</h4>
 			<input
 				type="checkbox"
