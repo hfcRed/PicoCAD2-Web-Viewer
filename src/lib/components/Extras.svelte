@@ -18,6 +18,34 @@
 	> enabled if you need clean GIF exports with a transparent background.
 </p>
 
+<h3>Material Effects</h3>
+
+<fieldset>
+	<legend>
+		<label class="form-collapse">
+			<h4>Cutout</h4>
+			<input
+				type="checkbox"
+				bind:checked={
+					() => viewer.extras.colorCutout.enabled!,
+					(v) => viewer.update((pico) => (pico.extras.colorCutout.enabled = v))
+				}
+			/>
+		</label>
+	</legend>
+	{#if viewer.extras.colorCutout.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.colorCutout.maskedColors = selectedColors))}
+		/>
+	{/if}
+</fieldset>
+<hr />
+
+<h3>Geometry Effects</h3>
+
+<h3>Scene Effects</h3>
+
 <fieldset>
 	<legend>
 		<label class="form-collapse">
@@ -56,27 +84,9 @@
 	{/if}
 </fieldset>
 <hr />
-<fieldset>
-	<legend>
-		<label class="form-collapse">
-			<h4>Cutout</h4>
-			<input
-				type="checkbox"
-				bind:checked={
-					() => viewer.extras.colorCutout.enabled!,
-					(v) => viewer.update((pico) => (pico.extras.colorCutout.enabled = v))
-				}
-			/>
-		</label>
-	</legend>
-	{#if viewer.extras.colorCutout.enabled}
-		<MaskSelector
-			onChange={(selectedColors) =>
-				viewer.update((pico) => (pico.extras.colorCutout.maskedColors = selectedColors))}
-		/>
-	{/if}
-</fieldset>
-<hr />
+
+<h3>Post Processing</h3>
+
 <fieldset>
 	<legend>
 		<label class="form-collapse">
@@ -1264,5 +1274,13 @@
 <style>
 	code {
 		padding-block: 0.15rem;
+	}
+
+	h3 {
+		background-color: var(--pico-form-element-background-color);
+		border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+		border-radius: var(--pico-border-radius);
+		padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+		text-align: center;
 	}
 </style>
