@@ -58,7 +58,8 @@ class Viewer {
 			canvas,
 			context: this.context,
 			resolution: { width: 128, height: 128, scale: 4 },
-			maxFps: 0
+			maxFps: 0,
+			clampCameraDistance: true
 		});
 
 		this.setupWorker();

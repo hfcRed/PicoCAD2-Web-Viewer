@@ -46,7 +46,8 @@ export const DEFAULT_SETTINGS = {
 		height: 128,
 		scale: 4
 	},
-	maxFps: 0
+	maxFps: 0,
+	clampCameraDistance: true
 } as const satisfies ViewerSettings;
 
 export const DEFAULT_EXTRAS = {
@@ -146,13 +147,6 @@ export const DEFAULT_EXTRAS = {
 		angle: 0,
 		blend: 0,
 		mode: 'dots',
-		maskedColors: []
-	},
-	crt: {
-		enabled: false,
-		modelOnly: true,
-		curvature: 0,
-		scanlineIntensity: 0,
 		maskedColors: []
 	},
 	pixelation: {

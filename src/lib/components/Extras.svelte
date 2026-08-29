@@ -150,6 +150,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.depthFog.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.depthFog.maskedColors = selectedColors))}
+		/>
 		<label>
 			Color
 			<input
@@ -231,6 +235,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.edgeDetection.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.edgeDetection.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Threshold"
 			min={0}
@@ -301,6 +309,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.colorGrading.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.colorGrading.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Brightness"
 			min={0}
@@ -369,6 +381,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.colorTint.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.colorTint.maskedColors = selectedColors))}
+		/>
 		<label>
 			Mode
 			<select
@@ -461,6 +477,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.posterization.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.posterization.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Levels"
 			min={2}
@@ -550,6 +570,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.sharpen.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.sharpen.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Strength"
 			min={0}
@@ -598,6 +622,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.bloom.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.bloom.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Threshold"
 			min={0}
@@ -656,6 +684,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.dithering.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.dithering.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Amount"
 			min={0}
@@ -734,6 +766,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.halftone.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.halftone.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Dot Size"
 			min={0}
@@ -784,54 +820,6 @@
 				bind:checked={
 					() => viewer.extras.halftone.modelOnly!,
 					(v) => viewer.update((pico) => (pico.extras.halftone.modelOnly = v))
-				}
-			/>
-			Model Only
-		</label>
-	{/if}
-</fieldset>
-<hr />
-<fieldset>
-	<legend>
-		<label class="form-collapse">
-			<h4>CRT</h4>
-			<input
-				type="checkbox"
-				bind:checked={
-					() => viewer.extras.crt.enabled!,
-					(v) => viewer.update((pico) => (pico.extras.crt.enabled = v))
-				}
-			/>
-		</label>
-	</legend>
-	{#if viewer.extras.crt.enabled}
-		<NumericControl
-			label="Curvature"
-			min={0}
-			max={1}
-			step={0.01}
-			bind:value={
-				() => viewer.extras.crt.curvature!,
-				(v) => viewer.update((pico) => (pico.extras.crt.curvature = v))
-			}
-		/>
-		<NumericControl
-			label="Scanline Intensity"
-			min={0}
-			max={1}
-			step={0.01}
-			bind:value={
-				() => viewer.extras.crt.scanlineIntensity!,
-				(v) => viewer.update((pico) => (pico.extras.crt.scanlineIntensity = v))
-			}
-		/>
-		<label class="form-margin">
-			<input
-				type="checkbox"
-				role="switch"
-				bind:checked={
-					() => viewer.extras.crt.modelOnly!,
-					(v) => viewer.update((pico) => (pico.extras.crt.modelOnly = v))
 				}
 			/>
 			Model Only
@@ -970,6 +958,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.chromaticAberration.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.chromaticAberration.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Strength"
 			min={0}
@@ -1068,6 +1060,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.noise.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.noise.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Amount"
 			min={0}
@@ -1106,6 +1102,10 @@
 		</label>
 	</legend>
 	{#if viewer.extras.glitch.enabled}
+		<MaskSelector
+			onChange={(selectedColors) =>
+				viewer.update((pico) => (pico.extras.glitch.maskedColors = selectedColors))}
+		/>
 		<NumericControl
 			label="Intensity"
 			min={0}
