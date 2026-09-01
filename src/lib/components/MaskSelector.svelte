@@ -3,32 +3,31 @@
 	import { rgbToHex } from '$lib/utils';
 
 	interface Props {
+		selected: number[];
 		onChange: (selectedColors: number[]) => void;
+		title?: string;
 	}
 
-	let { onChange }: Props = $props();
-
-	const selectedColors: number[] = [];
+	let { selected, onChange, title }: Props = $props();
 
 	function updateSelection(index: number) {
-		if (selectedColors.includes(index)) {
-			selectedColors.splice(selectedColors.indexOf(index), 1);
-		} else {
-			selectedColors.push(index);
-		}
+		const next = selected.includes(index)
+			? selected.filter((i) => i !== index)
+			: [...selected, index];
 
-		onChange(selectedColors);
+		onChange(next);
 	}
 </script>
 
 {#if viewer.pico.modelInfo?.palette}
 	<details>
-		<summary>Color Mask</summary>
+		<summary>{title ?? 'Color Mask'}</summary>
 		<div class="color-grid">
 			{#each viewer.pico.modelInfo?.palette as color, i (i)}
 				<input
 					type="checkbox"
 					style="background-color: {rgbToHex(color)}"
+					checked={selected.includes(i)}
 					onchange={() => updateSelection(i)}
 				/>
 			{/each}

@@ -2,7 +2,7 @@ import {
 	PicoCAD2Viewer,
 	PicoCAD2Context,
 	type ViewerSettings,
-	type ExtrasOptions,
+	type ExtrasState,
 	type PicoCAD2ViewerState,
 	type RenderStats,
 	type CameraMode
@@ -27,7 +27,8 @@ interface LoadRequest {
 
 class Viewer {
 	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
-	extras = $state<Required<ExtrasOptions>>({ ...DEFAULT_EXTRAS });
+	extras = $state<ExtrasState>({ ...DEFAULT_EXTRAS });
+	meshNames = $state<string[]>([]);
 	animationDuration = $state(0);
 	stats = $state<Stats>({ drawCalls: 0, polyCount: 0, fps: 0 });
 	loaded = $state(false);
@@ -192,6 +193,7 @@ class Viewer {
 
 		this.loaded = true;
 		this.updateState();
+		this.updateMeshNames();
 
 		if (this.settings.resolution.width !== this.settings.resolution.height) {
 			this.usingCustomResolution = true;
@@ -212,6 +214,32 @@ class Viewer {
 
 		this.loaded = true;
 		this.updateState();
+		this.updateMeshNames();
+	}
+
+	// The library resolves billboard nodes by name but does not expose the
+	// scene graph, so mesh names are read from the raw model source.
+	private updateMeshNames() {
+		const source = this.pico.getState().source;
+		if (!source) {
+			this.meshNames = [];
+			return;
+		}
+
+		try {
+			// getState() returns the source as a parsed object despite the
+			// string type, so handle both forms.
+			const raw = typeof source === 'string' ? JSON.parse(source) : source;
+			const names: string[] = [];
+			const walk = (node: { name?: string; mesh?: unknown; children?: unknown[] }) => {
+				if (node.mesh && node.name && !names.includes(node.name)) names.push(node.name);
+				for (const child of node.children ?? []) walk(child as typeof node);
+			};
+			walk(raw.graph ?? {});
+			this.meshNames = names;
+		} catch {
+			this.meshNames = [];
+		}
 	}
 
 	update(fn: (pico: PicoCAD2Viewer) => void) {
