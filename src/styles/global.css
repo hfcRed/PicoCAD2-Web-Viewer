@@ -127,10 +127,7 @@ textarea {
 	justify-content: space-between;
 	gap: 0.5rem;
 	user-select: none;
-
-	&:has(input[type='checkbox']:checked) {
-		margin-bottom: var(--pico-spacing);
-	}
+	margin-bottom: var(--pico-spacing);
 
 	& h2,
 	h3,

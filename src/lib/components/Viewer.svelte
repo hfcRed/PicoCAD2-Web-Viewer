@@ -202,7 +202,6 @@
 		gap: 0.5rem;
 		width: 100%;
 		aspect-ratio: 1 / 1;
-		z-index: 10;
 
 		canvas {
 			border: var(--pico-border-width) solid var(--pico-form-element-border-color);

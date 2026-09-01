@@ -5,6 +5,7 @@
 	import MaskSelector from './MaskSelector.svelte';
 	import MeshSelector from './MeshSelector.svelte';
 	import PaletteSwapSelector from './PaletteSwapSelector.svelte';
+	import EffectInfo from './EffectInfo.svelte';
 </script>
 
 <p>
@@ -23,61 +24,80 @@
 <h3>Material Effects</h3>
 
 <fieldset>
-	<legend>
-		<label class="form-collapse">
-			<h4>Color Palette</h4>
-			<input
-				type="checkbox"
-				bind:checked={
-					() => viewer.extras.paletteSwap.enabled!,
-					(v) => viewer.update((pico) => (pico.extras.paletteSwap.enabled = v))
+	<div class="effect">
+		<legend>
+			<label class="form-collapse">
+				<h4>Color Palette</h4>
+				<input
+					type="checkbox"
+					bind:checked={
+						() => viewer.extras.paletteSwap.enabled!,
+						(v) => viewer.update((pico) => (pico.extras.paletteSwap.enabled = v))
+					}
+				/>
+			</label>
+		</legend>
+		<EffectInfo
+			description="Allows you to swap and cycle colors by rewriting the models pallette. Swapped colors render with the proper shade ramp and affect all pallette colors used by other effects. Does not affect color masking."
+		/>
+	</div>
+	{#if viewer.extras.paletteSwap.enabled}
+		<div class="effect">
+			<PaletteSwapSelector
+				onChange={(map) => viewer.update((pico) => (pico.extras.paletteSwap.map = map))}
+			/>
+		</div>
+		<div class="effect">
+			<MaskSelector
+				selected={viewer.extras.paletteSwap.cycleIndices!}
+				title="Colors to Cycle"
+				onChange={(selectedColors) =>
+					viewer.update((pico) => (pico.extras.paletteSwap.cycleIndices = selectedColors))}
+			/>
+		</div>
+		<div class="effect">
+			<NumericControl
+				label="Cycle Speed"
+				min={0}
+				max={20}
+				step={1}
+				bind:value={
+					() => viewer.extras.paletteSwap.cycleSpeed!,
+					(v) => viewer.update((pico) => (pico.extras.paletteSwap.cycleSpeed = v))
 				}
 			/>
-		</label>
-	</legend>
-	{#if viewer.extras.paletteSwap.enabled}
-		<PaletteSwapSelector
-			onChange={(map) => viewer.update((pico) => (pico.extras.paletteSwap.map = map))}
-		/>
-		<MaskSelector
-			selected={viewer.extras.paletteSwap.cycleIndices!}
-			title="Colors to Cycle"
-			onChange={(selectedColors) =>
-				viewer.update((pico) => (pico.extras.paletteSwap.cycleIndices = selectedColors))}
-		/>
-		<NumericControl
-			label="Cycle Speed"
-			min={0}
-			max={20}
-			step={1}
-			bind:value={
-				() => viewer.extras.paletteSwap.cycleSpeed!,
-				(v) => viewer.update((pico) => (pico.extras.paletteSwap.cycleSpeed = v))
-			}
-		/>
-		<NumericControl
-			label="Blend Time"
-			min={0}
-			max={1}
-			step={0.01}
-			bind:value={
-				() => viewer.extras.paletteSwap.cycleBlendTime!,
-				(v) => viewer.update((pico) => (pico.extras.paletteSwap.cycleBlendTime = v))
-			}
-		/>
-		<label>
-			Blend Style
-			<select
+			<EffectInfo description="The amount of cycle steps per second for the color cycle." />
+		</div>
+		<div class="effect">
+			<NumericControl
+				label="Blend Time"
+				min={0}
+				max={1}
+				step={0.01}
 				bind:value={
-					() => viewer.extras.paletteSwap.cycleStyle!,
-					(v) => viewer.update((pico) => (pico.extras.paletteSwap.cycleStyle = v))
+					() => viewer.extras.paletteSwap.cycleBlendTime!,
+					(v) => viewer.update((pico) => (pico.extras.paletteSwap.cycleBlendTime = v))
 				}
-			>
-				<option value="palette">Palette</option>
-				<option value="dithered">Dithered</option>
-				<option value="smooth">Smooth</option>
-			</select>
-		</label>
+			/>
+		</div>
+		<div class="effect">
+			<label>
+				Blend Style
+				<select
+					bind:value={
+						() => viewer.extras.paletteSwap.cycleStyle!,
+						(v) => viewer.update((pico) => (pico.extras.paletteSwap.cycleStyle = v))
+					}
+				>
+					<option value="palette">Palette</option>
+					<option value="dithered">Dithered</option>
+					<option value="smooth">Smooth</option>
+				</select>
+			</label>
+			<EffectInfo
+				description="The blend style for the color cycle. Palette snaps instantly, dithered dissolves pixels to the next color, smooth cross-fades gradually between colors."
+			/>
+		</div>
 	{/if}
 </fieldset>
 <hr />
@@ -3360,5 +3380,20 @@
 		border-radius: var(--pico-border-radius);
 		padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
 		text-align: center;
+	}
+
+	.effect {
+		display: grid;
+		gap: var(--pico-form-element-spacing-horizontal);
+		grid-template-columns: 1fr 1.25rem;
+		align-items: center;
+	}
+
+	fieldset {
+		margin-bottom: 0 !important;
+	}
+
+	hr {
+		margin-top: 0 !important;
 	}
 </style>
