@@ -349,6 +349,37 @@ export const EFFECT_SECTIONS = [
 					c.style()
 				]
 			}),
+			effect('projection', {
+				title: 'Projection',
+				info: 'Projects a pattern onto the model along a direction. Light brightens shaded surfaces toward their lit color, shadow darkens them, and tint paints a color where the pattern hits. Only faces turned toward the direction receive it.',
+				controls: (c) => [
+					c.mask(),
+					c.nodes(),
+					c.select('pattern', 'Pattern', PATTERN_OPTIONS),
+					c.select(
+						'mode',
+						'Mode',
+						[
+							{ value: 'light', label: 'Light' },
+							{ value: 'shadow', label: 'Shadow' },
+							{ value: 'tint', label: 'Tint' }
+						],
+						{
+							info: "Light only shows on shaded surfaces, since lit is the palette's brightest. Shadow and tint show everywhere the pattern lands."
+						}
+					),
+					c.color('color', 'Color', { showIf: (e) => e.projection.mode === 'tint' }),
+					...c.vec('direction', 'Direction', -1, 1, 0.01),
+					c.slider('scale', 'Scale', 0.1, 20, 0.1),
+					c.slider('speed', 'Speed', 0, 10, 0.1),
+					c.slider('seed', 'Seed', 0, 100, 1),
+					c.slider('strength', 'Strength', 0, 1, 0.01),
+					c.slider('facing', 'Facing', 0, 1, 0.01, {
+						info: 'How squarely a face must face the direction to receive the projection. 0 lets every face the direction can see receive it.'
+					}),
+					c.style()
+				]
+			}),
 			effect('interior', {
 				title: 'Interior',
 				info: 'Fakes depth behind the masked palette colors by marching into the surface and sampling a procedural pattern at several depths, with parallax that tracks the camera.',
@@ -360,6 +391,7 @@ export const EFFECT_SECTIONS = [
 					c.slider('layers', 'Layers', 1, 5, 1),
 					c.slider('scale', 'Scale', 0, 20, 0.1),
 					c.slider('speed', 'Speed', 0, 10, 0.1),
+					c.slider('seed', 'Seed', 0, 100, 1),
 					c.color('color', 'Color'),
 					c.color('backgroundColor', 'Background Color'),
 					c.toggle('randomHue', 'Random Hue', { info: RANDOM_HUE_INFO }),
