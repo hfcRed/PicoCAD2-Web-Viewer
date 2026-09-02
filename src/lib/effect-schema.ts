@@ -135,6 +135,15 @@ const CYCLE_INFO =
 const SWEEP_MODE_INFO =
 	'Where the front runs. Uniform applies to the whole model at once, noise applies to random cells, directional sweeps a plane along the direction, point grows a sphere from the point, and proximity wipes front to back from the camera.';
 
+const SWEEP_WAVE_INFO =
+	'Width of a traveling wave as a fraction of the sweep range. The wave enters at progress 0 and has left at progress 1, restoring the model behind it. 0 sweeps a front that stays.';
+
+const SWEEP_INVERT_INFO =
+	'Inverts the progress. At 0 the whole model is swept and it restores as the progress rises.';
+
+const hasWave = (mode: string | undefined) =>
+	mode === 'directional' || mode === 'point' || mode === 'proximity';
+
 const SWEEP_MODE_OPTIONS = [
 	{ value: 'uniform', label: 'Uniform' },
 	{ value: 'noise', label: 'Noise' },
@@ -313,6 +322,10 @@ export const EFFECT_SECTIONS = [
 					c.slider('sweep.softness', 'Softness', 0, 1, 0.01, {
 						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
 					}),
+					c.slider('sweep.wave', 'Wave', 0, 1, 0.01, {
+						showIf: (e) => hasWave(e.dissolve.sweep?.mode),
+						info: SWEEP_WAVE_INFO
+					}),
 					c.slider('edgeWidth', 'Edge Width', 0, 10, 0.01, {
 						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
 					}),
@@ -320,9 +333,7 @@ export const EFFECT_SECTIONS = [
 						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
 					}),
 					c.style(),
-					c.toggle('sweep.invert', 'Invert', {
-						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
-					})
+					c.toggle('sweep.invert', 'Invert', { info: SWEEP_INVERT_INFO })
 				]
 			}),
 			effect('emission', {
@@ -513,9 +524,37 @@ export const EFFECT_SECTIONS = [
 		effects: [
 			effect('meshDeform', {
 				title: 'Mesh Deform',
-				info: 'Stackable geometry deforms. Voxel remeshes the model into grid-aligned cubes that keep the color of the surface they replace, and the barrel, spherify and twist warps apply on top, so a voxelized model can still bend.',
+				info: 'Stackable geometry deforms. Voxel remeshes the model into grid-aligned cubes that keep the color of the surface they replace, and the barrel, spherify and twist warps apply on top, so a voxelized model can still bend. The progress runs the whole deform from untouched to full, and a sweep moves its front across the model.',
 				controls: (c) => [
 					c.nodes(),
+					c.slider('progress', 'Progress', 0, 1, 0.01, {
+						showIf: (e) => !e.meshDeform.cycle?.enabled
+					}),
+					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
+					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
+						showIf: (e) => !!e.meshDeform.cycle?.enabled
+					}),
+					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
+						showIf: (e) => !!e.meshDeform.cycle?.enabled
+					}),
+					c.select('sweep.mode', 'Sweep', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
+					c.slider('sweep.scale', 'Sweep Scale', 0, 20, 0.01, {
+						showIf: (e) => e.meshDeform.sweep?.mode === 'noise'
+					}),
+					...c.vec('sweep.direction', 'Sweep Direction', -1, 1, 0.01, {
+						showIf: (e) => e.meshDeform.sweep?.mode === 'directional'
+					}),
+					...c.vec('sweep.point', 'Sweep Point', -1, 1, 0.01, {
+						showIf: (e) => e.meshDeform.sweep?.mode === 'point'
+					}),
+					c.slider('sweep.softness', 'Sweep Softness', 0, 1, 0.01, {
+						showIf: (e) => e.meshDeform.sweep?.mode !== 'uniform'
+					}),
+					c.slider('sweep.wave', 'Sweep Wave', 0, 1, 0.01, {
+						showIf: (e) => hasWave(e.meshDeform.sweep?.mode),
+						info: SWEEP_WAVE_INFO
+					}),
+					c.toggle('sweep.invert', 'Sweep Invert', { info: SWEEP_INVERT_INFO }),
 					c.toggle('voxel.enabled', 'Voxel'),
 					c.slider('voxel.gridSize', 'Voxel Grid Size', 0.05, 2, 0.01, {
 						showIf: (e) => e.meshDeform.voxel?.enabled === true
@@ -571,6 +610,24 @@ export const EFFECT_SECTIONS = [
 					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
 						showIf: (e) => !!e.triangleShatter.cycle?.enabled
 					}),
+					c.select('sweep.mode', 'Sweep', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
+					c.slider('sweep.scale', 'Sweep Scale', 0, 20, 0.01, {
+						showIf: (e) => e.triangleShatter.sweep?.mode === 'noise'
+					}),
+					...c.vec('sweep.direction', 'Sweep Direction', -1, 1, 0.01, {
+						showIf: (e) => e.triangleShatter.sweep?.mode === 'directional'
+					}),
+					...c.vec('sweep.point', 'Sweep Point', -1, 1, 0.01, {
+						showIf: (e) => e.triangleShatter.sweep?.mode === 'point'
+					}),
+					c.slider('sweep.softness', 'Sweep Softness', 0, 1, 0.01, {
+						showIf: (e) => e.triangleShatter.sweep?.mode !== 'uniform'
+					}),
+					c.slider('sweep.wave', 'Sweep Wave', 0, 1, 0.01, {
+						showIf: (e) => hasWave(e.triangleShatter.sweep?.mode),
+						info: SWEEP_WAVE_INFO
+					}),
+					c.toggle('sweep.invert', 'Sweep Invert', { info: SWEEP_INVERT_INFO }),
 					c.select('mode', 'Mode', [
 						{ value: 'normal', label: 'Normal' },
 						{ value: 'radial', label: 'Radial' },
