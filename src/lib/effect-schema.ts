@@ -129,6 +129,9 @@ const MODEL_ONLY_INFO =
 const RANDOM_HUE_INFO =
 	'Gives each element a random hue shift within the hue range. Not available in palette style.';
 
+const CYCLE_INFO =
+	'Runs the progress from 0 to 1 and back automatically. One cycle takes the cycle duration in seconds, including a rest of the hold length at each end. The manual progress is ignored while cycling.';
+
 const STYLE_OPTIONS = [
 	{ value: 'palette', label: 'Palette' },
 	{ value: 'dithered', label: 'Dithered' },
@@ -282,7 +285,16 @@ export const EFFECT_SECTIONS = [
 						{ value: 'point', label: 'Point' },
 						{ value: 'proximity', label: 'Proximity' }
 					]),
-					c.slider('progress', 'Progress', 0, 1, 0.01),
+					c.slider('progress', 'Progress', 0, 1, 0.01, {
+						showIf: (e) => !e.dissolve.cycle?.enabled
+					}),
+					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
+					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
+						showIf: (e) => !!e.dissolve.cycle?.enabled
+					}),
+					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
+						showIf: (e) => !!e.dissolve.cycle?.enabled
+					}),
 					c.slider('scale', 'Scale', 0, 20, 0.01, {
 						showIf: (e) => e.dissolve.mode === 'noise'
 					}),
@@ -503,7 +515,16 @@ export const EFFECT_SECTIONS = [
 				controls: (c) => [
 					c.mask(),
 					c.nodes(),
-					c.slider('progress', 'Progress', 0, 1, 0.01),
+					c.slider('progress', 'Progress', 0, 1, 0.01, {
+						showIf: (e) => !e.triangleShatter.cycle?.enabled
+					}),
+					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
+					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
+						showIf: (e) => !!e.triangleShatter.cycle?.enabled
+					}),
+					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
+						showIf: (e) => !!e.triangleShatter.cycle?.enabled
+					}),
 					c.select('mode', 'Mode', [
 						{ value: 'normal', label: 'Normal' },
 						{ value: 'radial', label: 'Radial' },
