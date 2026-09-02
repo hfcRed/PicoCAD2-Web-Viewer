@@ -61,7 +61,7 @@ class Viewer {
 			context: this.context,
 			resolution: { width: 128, height: 128, scale: 4 },
 			maxFps: 0,
-			clampCameraDistance: true
+			clampCameraDistance: { enabled: true, minimumDistance: 2 }
 		});
 
 		this.setupWorker();

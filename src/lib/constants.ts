@@ -47,5 +47,5 @@ export const DEFAULT_SETTINGS = {
 		scale: 4
 	},
 	maxFps: 0,
-	clampCameraDistance: true
+	clampCameraDistance: { enabled: true, minimumDistance: 2 }
 } as const satisfies ViewerSettings;
