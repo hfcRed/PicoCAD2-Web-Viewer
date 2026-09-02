@@ -132,6 +132,17 @@ const RANDOM_HUE_INFO =
 const CYCLE_INFO =
 	'Runs the progress from 0 to 1 and back automatically. One cycle takes the cycle duration in seconds, including a rest of the hold length at each end. The manual progress is ignored while cycling.';
 
+const SWEEP_MODE_INFO =
+	'Where the front runs. Uniform applies to the whole model at once, noise applies to random cells, directional sweeps a plane along the direction, point grows a sphere from the point, and proximity wipes front to back from the camera.';
+
+const SWEEP_MODE_OPTIONS = [
+	{ value: 'uniform', label: 'Uniform' },
+	{ value: 'noise', label: 'Noise' },
+	{ value: 'directional', label: 'Directional' },
+	{ value: 'point', label: 'Point' },
+	{ value: 'proximity', label: 'Proximity' }
+] as const satisfies readonly SelectOption[];
+
 const STYLE_OPTIONS = [
 	{ value: 'palette', label: 'Palette' },
 	{ value: 'dithered', label: 'Dithered' },
@@ -279,12 +290,7 @@ export const EFFECT_SECTIONS = [
 				controls: (c) => [
 					c.mask(),
 					c.nodes(),
-					c.select('mode', 'Mode', [
-						{ value: 'noise', label: 'Noise' },
-						{ value: 'directional', label: 'Directional' },
-						{ value: 'point', label: 'Point' },
-						{ value: 'proximity', label: 'Proximity' }
-					]),
+					c.select('sweep.mode', 'Mode', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
 					c.slider('progress', 'Progress', 0, 1, 0.01, {
 						showIf: (e) => !e.dissolve.cycle?.enabled
 					}),
@@ -295,20 +301,28 @@ export const EFFECT_SECTIONS = [
 					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
 						showIf: (e) => !!e.dissolve.cycle?.enabled
 					}),
-					c.slider('scale', 'Scale', 0, 20, 0.01, {
-						showIf: (e) => e.dissolve.mode === 'noise'
+					c.slider('sweep.scale', 'Scale', 0, 20, 0.01, {
+						showIf: (e) => e.dissolve.sweep?.mode === 'noise'
 					}),
-					...c.vec('direction', 'Direction', -1, 1, 0.01, {
-						showIf: (e) => e.dissolve.mode === 'directional'
+					...c.vec('sweep.direction', 'Direction', -1, 1, 0.01, {
+						showIf: (e) => e.dissolve.sweep?.mode === 'directional'
 					}),
-					...c.vec('point', 'Point', -1, 1, 0.01, {
-						showIf: (e) => e.dissolve.mode === 'point'
+					...c.vec('sweep.point', 'Point', -1, 1, 0.01, {
+						showIf: (e) => e.dissolve.sweep?.mode === 'point'
 					}),
-					c.slider('softness', 'Softness', 0, 1, 0.01),
-					c.slider('edgeWidth', 'Edge Width', 0, 10, 0.01),
-					c.color('edgeColor', 'Edge Color'),
+					c.slider('sweep.softness', 'Softness', 0, 1, 0.01, {
+						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
+					}),
+					c.slider('edgeWidth', 'Edge Width', 0, 10, 0.01, {
+						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
+					}),
+					c.color('edgeColor', 'Edge Color', {
+						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
+					}),
 					c.style(),
-					c.toggle('invert', 'Invert')
+					c.toggle('sweep.invert', 'Invert', {
+						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
+					})
 				]
 			}),
 			effect('emission', {
