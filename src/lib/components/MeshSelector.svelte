@@ -19,15 +19,16 @@
 {#if viewer.meshNames.length > 0}
 	<details>
 		<summary>{title ?? 'Mesh Selection'}</summary>
-		<div class="mesh-list">
-			{#each viewer.meshNames as name (name)}
-				<label>
+		<div class="mesh-list scrollbar">
+			{#each viewer.meshNames as entry (entry.name)}
+				<label style:padding-left="{entry.depth * 1.25}rem" class:group={entry.group}>
 					<input
 						type="checkbox"
-						checked={selected.includes(name)}
-						onchange={() => updateSelection(name)}
+						checked={selected.includes(entry.name)}
+						onchange={() => updateSelection(entry.name)}
 					/>
-					{name}
+					<span class="name">{entry.name}</span>
+					{#if entry.group}<small>(group)</small>{/if}
 				</label>
 			{/each}
 		</div>
@@ -72,5 +73,14 @@
 	input {
 		margin: 0;
 		flex-shrink: 0;
+	}
+
+	.name {
+		min-width: 0;
+	}
+
+	.group small {
+		flex-shrink: 0;
+		color: var(--pico-muted-color);
 	}
 </style>

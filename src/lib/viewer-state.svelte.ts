@@ -20,6 +20,12 @@ interface Gif {
 	initialRotation: number;
 }
 
+export interface SceneNodeEntry {
+	name: string;
+	depth: number;
+	group: boolean;
+}
+
 interface LoadRequest {
 	model?: string;
 	state?: PicoCAD2ViewerState;
@@ -29,7 +35,7 @@ interface LoadRequest {
 class Viewer {
 	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
 	extras = $state<ExtrasState>(getDefaultExtras());
-	meshNames = $state<string[]>([]);
+	meshNames = $state<SceneNodeEntry[]>([]);
 	animationDuration = $state(0);
 	stats = $state<Stats>({ drawCalls: 0, polyCount: 0, fps: 0 });
 	loaded = $state(false);
@@ -218,8 +224,9 @@ class Viewer {
 		this.updateMeshNames();
 	}
 
-	// The library resolves billboard nodes by name but does not expose the
-	// scene graph, so mesh names are read from the raw model source.
+	// The library resolves effect nodes by name but does not expose the
+	// scene graph, so the node tree is read from the raw model source.
+	// Groups are listed too, selecting one selects its whole subtree.
 	private updateMeshNames() {
 		const source = this.pico.getState().source;
 		if (!source) {
@@ -231,13 +238,21 @@ class Viewer {
 			// getState() returns the source as a parsed object despite the
 			// string type, so handle both forms.
 			const raw = typeof source === 'string' ? JSON.parse(source) : source;
-			const names: string[] = [];
-			const walk = (node: { name?: string; mesh?: unknown; children?: unknown[] }) => {
-				if (node.mesh && node.name && !names.includes(node.name)) names.push(node.name);
-				for (const child of node.children ?? []) walk(child as typeof node);
+			const entries: SceneNodeEntry[] = [];
+			const listed = (name: string) => entries.some((e) => e.name === name);
+			const walk = (
+				node: { name?: string; mesh?: unknown; children?: unknown[] },
+				depth: number
+			) => {
+				// Effects match by name, so a repeated name is listed once, at
+				// its first (shallowest) occurrence.
+				if (node.name && !listed(node.name)) {
+					entries.push({ name: node.name, depth, group: !node.mesh });
+				}
+				for (const child of node.children ?? []) walk(child as typeof node, depth + 1);
 			};
-			walk(raw.graph ?? {});
-			this.meshNames = names;
+			for (const child of raw.graph?.children ?? []) walk(child, 0);
+			this.meshNames = entries;
 		} catch {
 			this.meshNames = [];
 		}

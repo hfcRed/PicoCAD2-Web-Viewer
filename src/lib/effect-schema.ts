@@ -109,14 +109,16 @@ interface BaseBuilders<T> {
 		title: string,
 		extra?: Extra
 	): Control;
-	meshes<P extends string>(path: PathOf<T, P, readonly string[]>, title: string): Control;
 	paletteMap<P extends string>(path: PathOf<T, P, readonly number[]>): Control;
 }
 
 type ControlBuilders<T> = BaseBuilders<T> &
 	('maskedColors' extends keyof NonNullable<T> ? { mask(extra?: Extra): Control } : unknown) &
+	('nodes' extends keyof NonNullable<T> ? { nodes(): Control } : unknown) &
 	('style' extends keyof NonNullable<T> ? { style(): Control } : unknown) &
 	('modelOnly' extends keyof NonNullable<T> ? { modelOnly(): Control } : unknown);
+
+const NODES_TITLE = 'Meshes';
 
 const STYLE_INFO =
 	"Palette renders the effect with the model's palette only, so colors snap to the nearest palette entry and soft edges dither with the shading checkerboard. Dithered keeps the checkerboard but uses the configured colors as-is. Smooth blends colors directly.";
@@ -219,7 +221,7 @@ const BUILDERS = {
 		title,
 		...extra
 	}),
-	meshes: (path: string, title: string): Control => ({ kind: 'meshes', path, title }),
+	nodes: (): Control => ({ kind: 'meshes', path: 'nodes', title: NODES_TITLE }),
 	paletteMap: (path: string): Control => ({ kind: 'paletteMap', path }),
 	style: (): Control => BUILDERS.select('style', 'Style', STYLE_OPTIONS, { info: STYLE_INFO }),
 	modelOnly: (): Control => BUILDERS.toggle('modelOnly', 'Model Only', { info: MODEL_ONLY_INFO })
@@ -266,13 +268,14 @@ export const EFFECT_SECTIONS = [
 			effect('colorCutout', {
 				title: 'Cutout',
 				info: 'Renders the selected palette colors as additional transparent colors. The cutouts are real holes that outlines, depth effects and color masks recognize. Nothing is cut while no colors are selected.',
-				controls: (c) => [c.mask()]
+				controls: (c) => [c.mask(), c.nodes()]
 			}),
 			effect('dissolve', {
 				title: 'Dissolve',
 				info: 'Dissolves the model texel by texel as the progress runs from 0 to 1, punching real holes that outlines and depth effects recognize. Survivors near the cut show the edge color as a glowing band, and fur strands dissolve with their base surface.',
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.select('mode', 'Mode', [
 						{ value: 'noise', label: 'Noise' },
 						{ value: 'directional', label: 'Directional' },
@@ -301,6 +304,7 @@ export const EFFECT_SECTIONS = [
 				info: 'The masked palette colors ignore shading and render fullbright. The blink settings pulse the emission over time, and the scroll settings run lit band waves through the model. Pair with a bloom mask on the same colors for a glow halo.',
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.slider('strength', 'Strength', 0, 1, 0.01),
 					c.select('blinkMode', 'Blink Mode', [
 						{ value: 'smooth', label: 'Smooth' },
@@ -324,6 +328,7 @@ export const EFFECT_SECTIONS = [
 				info: 'Fakes depth behind the masked palette colors by marching into the surface and sampling a procedural pattern at several depths, with parallax that tracks the camera.',
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.select('pattern', 'Pattern', PATTERN_OPTIONS),
 					c.slider('depth', 'Depth', 0, 10, 0.1),
 					c.slider('layers', 'Layers', 1, 5, 1),
@@ -343,6 +348,7 @@ export const EFFECT_SECTIONS = [
 				info: 'Tints the model with a two-color ramp from the shadow color to the lit color, driven by the light direction, world height, or screen height.',
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.color('litColor', 'Lit Color'),
 					c.color('shadowColor', 'Shadow Color'),
 					c.select('source', 'Source', [
@@ -359,6 +365,7 @@ export const EFFECT_SECTIONS = [
 				info: 'Blinn-Phong highlight from the light source, with an optional procedural sky and ground reflection applied on top.',
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.slider('strength', 'Strength', 0, 2, 0.01),
 					c.slider('smoothness', 'Smoothness', 0, 1, 0.01),
 					c.color('color', 'Color'),
@@ -389,6 +396,7 @@ export const EFFECT_SECTIONS = [
 				info: "Fresnel rim light around the model's silhouette, where surfaces turn away from the camera.",
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.color('color', 'Color'),
 					c.slider('width', 'Width', 0, 1, 0.01),
 					c.slider('sharpness', 'Sharpness', 0, 1, 0.01),
@@ -407,6 +415,7 @@ export const EFFECT_SECTIONS = [
 				info: 'Sparkle cells that light up while the camera aligns with their random facet, popping in and out as the view orbits.',
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.select(
 						'space',
 						'Space',
@@ -448,6 +457,7 @@ export const EFFECT_SECTIONS = [
 				title: 'Mesh Deform',
 				info: 'Stackable geometry deforms. Voxel remeshes the model into grid-aligned cubes that keep the color of the surface they replace, and the barrel, spherify and twist warps apply on top, so a voxelized model can still bend.',
 				controls: (c) => [
+					c.nodes(),
 					c.toggle('voxel.enabled', 'Voxel'),
 					c.slider('voxel.gridSize', 'Voxel Grid Size', 0.05, 2, 0.01, {
 						showIf: (e) => e.meshDeform.voxel?.enabled === true
@@ -467,6 +477,7 @@ export const EFFECT_SECTIONS = [
 				info: "Random triangles blink a color for a moment. Flashing triangles keep their palette color underneath, so other effects' color masks are unaffected.",
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.color('color', 'Color'),
 					c.slider('rate', 'Rate', 0, 30, 1),
 					c.slider('density', 'Density', 0, 1, 0.01),
@@ -491,6 +502,7 @@ export const EFFECT_SECTIONS = [
 				info: 'Blows the model apart into its triangles as the progress runs from 0 to 1. The wireframe and fur hide while a shatter is in progress.',
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.slider('progress', 'Progress', 0, 1, 0.01),
 					c.select('mode', 'Mode', [
 						{ value: 'normal', label: 'Normal' },
@@ -512,6 +524,7 @@ export const EFFECT_SECTIONS = [
 				info: 'Grows shell-textured fur by redrawing the model as a stack of offset shells carved into strands. Fur only grows where the surface is painted with the masked colors, and it follows mesh deforms and dissolves.',
 				controls: (c) => [
 					c.mask(),
+					c.nodes(),
 					c.slider('length', 'Length', 0, 1, 0.01),
 					c.slider('layers', 'Layers', 1, 32, 1),
 					c.slider('density', 'Density', 1, 128, 1),
@@ -523,9 +536,9 @@ export const EFFECT_SECTIONS = [
 			}),
 			effect('billboard', {
 				title: 'Billboard',
-				info: 'Turns the selected meshes toward the camera while keeping their position and scale. With no meshes selected, all top-level meshes billboard. Children follow their parent, and billboarding overrides animated rotation.',
+				info: 'Turns the selected nodes toward the camera while keeping their position and scale. With nothing selected, every top-level node billboards, groups included. Children follow their parent, and billboarding overrides animated rotation.',
 				controls: (c) => [
-					c.meshes('nodes', 'Billboard Meshes'),
+					c.nodes(),
 					c.select(
 						'mode',
 						'Mode',
