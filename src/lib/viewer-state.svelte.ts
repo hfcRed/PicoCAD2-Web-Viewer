@@ -1,13 +1,14 @@
 import {
 	PicoCAD2Viewer,
 	PicoCAD2Context,
+	getDefaultExtras,
 	type ViewerSettings,
 	type ExtrasState,
 	type PicoCAD2ViewerState,
 	type RenderStats,
 	type CameraMode
 } from 'picocad2-web';
-import { DEFAULT_SETTINGS, DEFAULT_EXTRAS, CAMERA_LIMITS } from './constants';
+import { DEFAULT_SETTINGS, CAMERA_LIMITS } from './constants';
 
 type Stats = RenderStats & { fps: number };
 
@@ -27,7 +28,7 @@ interface LoadRequest {
 
 class Viewer {
 	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
-	extras = $state<ExtrasState>({ ...DEFAULT_EXTRAS });
+	extras = $state<ExtrasState>(getDefaultExtras());
 	meshNames = $state<string[]>([]);
 	animationDuration = $state(0);
 	stats = $state<Stats>({ drawCalls: 0, polyCount: 0, fps: 0 });
