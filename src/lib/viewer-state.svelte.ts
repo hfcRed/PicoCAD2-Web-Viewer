@@ -110,7 +110,7 @@ class Viewer {
 	confirmPendingLoad(keepSettings: boolean) {
 		if (!this.pendingLoad) return;
 
-		const request = this.pendingLoad;
+		const request = $state.snapshot(this.pendingLoad) as LoadRequest;
 		this.pendingLoad = null;
 		this.applyLoad(request, keepSettings);
 	}
