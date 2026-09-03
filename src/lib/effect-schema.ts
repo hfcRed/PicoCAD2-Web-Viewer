@@ -639,7 +639,9 @@ export const EFFECT_SECTIONS = [
 					c.slider('distance', 'Distance', 0, 10, 0.1),
 					c.slider('spread', 'Spread', 0, 2, 0.01),
 					c.slider('rotation', 'Rotation', 0, 10, 0.1),
-					c.slider('gravity', 'Gravity', 0, 10, 0.1),
+					c.slider('gravity', 'Gravity', -10, 10, 0.1, {
+						info: 'Pulls the pieces down as they fly. Negative values lift them instead.'
+					}),
 					c.slider('shrink', 'Shrink', 0, 1, 0.01)
 				]
 			}),
