@@ -299,7 +299,6 @@ export const EFFECT_SECTIONS = [
 				controls: (c) => [
 					c.mask(),
 					c.nodes(),
-					c.select('sweep.mode', 'Mode', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
 					c.slider('progress', 'Progress', 0, 1, 0.01, {
 						showIf: (e) => !e.dissolve.cycle?.enabled
 					}),
@@ -310,30 +309,31 @@ export const EFFECT_SECTIONS = [
 					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
 						showIf: (e) => !!e.dissolve.cycle?.enabled
 					}),
-					c.slider('sweep.scale', 'Scale', 0, 20, 0.01, {
+					c.select('sweep.mode', 'Sweep', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
+					c.slider('sweep.scale', 'Sweep Scale', 0, 20, 0.01, {
 						showIf: (e) => e.dissolve.sweep?.mode === 'noise'
 					}),
-					...c.vec('sweep.direction', 'Direction', -1, 1, 0.01, {
+					...c.vec('sweep.direction', 'Sweep Direction', -1, 1, 0.01, {
 						showIf: (e) => e.dissolve.sweep?.mode === 'directional'
 					}),
-					...c.vec('sweep.point', 'Point', -1, 1, 0.01, {
+					...c.vec('sweep.point', 'Sweep Point', -1, 1, 0.01, {
 						showIf: (e) => e.dissolve.sweep?.mode === 'point'
 					}),
-					c.slider('sweep.softness', 'Softness', 0, 1, 0.01, {
+					c.slider('sweep.softness', 'Sweep Softness', 0, 1, 0.01, {
 						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
 					}),
-					c.slider('sweep.wave', 'Wave', 0, 1, 0.01, {
+					c.slider('sweep.wave', 'Sweep Wave', 0, 1, 0.01, {
 						showIf: (e) => hasWave(e.dissolve.sweep?.mode),
 						info: SWEEP_WAVE_INFO
 					}),
+					c.toggle('sweep.invert', 'Sweep Invert', { info: SWEEP_INVERT_INFO }),
 					c.slider('edgeWidth', 'Edge Width', 0, 10, 0.01, {
 						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
 					}),
 					c.color('edgeColor', 'Edge Color', {
 						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
 					}),
-					c.style(),
-					c.toggle('sweep.invert', 'Invert', { info: SWEEP_INVERT_INFO })
+					c.style()
 				]
 			}),
 			effect('emission', {
