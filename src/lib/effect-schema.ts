@@ -563,10 +563,7 @@ export const EFFECT_SECTIONS = [
 					c.select('barrel.axis', 'Barrel Axis', AXIS_OPTIONS),
 					c.slider('spherify.amount', 'Spherify', 0, 1, 0.01),
 					c.slider('twist.amount', 'Twist', -5, 5, 0.01),
-					c.select('twist.axis', 'Twist Axis', AXIS_OPTIONS),
-					c.slider('twist.speed', 'Twist Speed', -10, 10, 0.1, {
-						info: 'Spins the twist over time, turning it into a tornado.'
-					})
+					c.select('twist.axis', 'Twist Axis', AXIS_OPTIONS)
 				]
 			}),
 			effect('triangleFlash', {
