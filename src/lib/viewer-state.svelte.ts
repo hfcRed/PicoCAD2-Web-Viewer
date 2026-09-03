@@ -147,6 +147,7 @@ class Viewer {
 				this.pico.setState(state);
 			} else if (model) {
 				this.pico.load(model);
+				if (!keepSettings) this.pico.extras.reset();
 			}
 
 			if (keepSettings && currentState) {
