@@ -304,8 +304,6 @@ class Viewer {
 		if (this.gif.recording || !this.worker || !this.workerReady) return;
 
 		const cameraMode = this.pico.cameraMode;
-		if (cameraMode === 'fixed' && !this.pico.animation.playing) return;
-
 		const info = this.pico.modelInfo;
 		if (!info) return;
 
