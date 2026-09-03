@@ -132,6 +132,9 @@ const RANDOM_HUE_INFO =
 const CYCLE_INFO =
 	'Runs the progress from 0 to 1 and back automatically. One cycle takes the cycle duration in seconds, including a rest of the hold length at each end. The manual progress is ignored while cycling.';
 
+const CYCLE_MODE_INFO =
+	'How the progress comes back. Ping-pong runs it from 1 back to 0, so the sweep retraces its path. Loop runs the sweep forward a second time to restore the model in the same direction.';
+
 const SWEEP_MODE_INFO =
 	'Where the front runs. Uniform applies to the whole model at once, noise applies to random cells, directional sweeps a plane along the direction, point grows a sphere from the point, and proximity wipes front to back from the camera.';
 
@@ -143,6 +146,11 @@ const SWEEP_INVERT_INFO =
 
 const hasWave = (mode: string | undefined) =>
 	mode === 'directional' || mode === 'point' || mode === 'proximity';
+
+const CYCLE_MODE_OPTIONS = [
+	{ value: 'pingpong', label: 'Ping-pong' },
+	{ value: 'loop', label: 'Loop' }
+] as const satisfies readonly SelectOption[];
 
 const SWEEP_MODE_OPTIONS = [
 	{ value: 'uniform', label: 'Uniform' },
@@ -303,6 +311,10 @@ export const EFFECT_SECTIONS = [
 						showIf: (e) => !e.dissolve.cycle?.enabled
 					}),
 					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
+					c.select('cycle.mode', 'Cycle Mode', CYCLE_MODE_OPTIONS, {
+						showIf: (e) => !!e.dissolve.cycle?.enabled,
+						info: CYCLE_MODE_INFO
+					}),
 					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
 						showIf: (e) => !!e.dissolve.cycle?.enabled
 					}),
@@ -531,6 +543,10 @@ export const EFFECT_SECTIONS = [
 						showIf: (e) => !e.meshDeform.cycle?.enabled
 					}),
 					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
+					c.select('cycle.mode', 'Cycle Mode', CYCLE_MODE_OPTIONS, {
+						showIf: (e) => !!e.meshDeform.cycle?.enabled,
+						info: CYCLE_MODE_INFO
+					}),
 					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
 						showIf: (e) => !!e.meshDeform.cycle?.enabled
 					}),
@@ -601,6 +617,10 @@ export const EFFECT_SECTIONS = [
 						showIf: (e) => !e.triangleShatter.cycle?.enabled
 					}),
 					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
+					c.select('cycle.mode', 'Cycle Mode', CYCLE_MODE_OPTIONS, {
+						showIf: (e) => !!e.triangleShatter.cycle?.enabled,
+						info: CYCLE_MODE_INFO
+					}),
 					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
 						showIf: (e) => !!e.triangleShatter.cycle?.enabled
 					}),
@@ -652,6 +672,10 @@ export const EFFECT_SECTIONS = [
 						showIf: (e) => !e.vertexGlitch.cycle?.enabled
 					}),
 					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
+					c.select('cycle.mode', 'Cycle Mode', CYCLE_MODE_OPTIONS, {
+						showIf: (e) => !!e.vertexGlitch.cycle?.enabled,
+						info: CYCLE_MODE_INFO
+					}),
 					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
 						showIf: (e) => !!e.vertexGlitch.cycle?.enabled
 					}),
