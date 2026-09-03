@@ -3,6 +3,7 @@ import {
 	PicoCAD2Context,
 	getDefaultExtras,
 	type ViewerSettings,
+	type ExtrasOptions,
 	type ExtrasState,
 	type PicoCAD2ViewerState,
 	type RenderStats,
@@ -11,6 +12,29 @@ import {
 import { DEFAULT_SETTINGS, CAMERA_LIMITS } from './constants';
 
 type Stats = RenderStats & { fps: number };
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+	typeof value === 'object' && value !== null && !Array.isArray(value);
+
+function assignDeep(target: Record<string, unknown>, source: unknown) {
+	if (!isObject(source)) return;
+	for (const [key, value] of Object.entries(source)) {
+		const current = target[key];
+		if (isObject(value) && isObject(current)) {
+			assignDeep(current, value);
+		} else {
+			target[key] = value;
+		}
+	}
+}
+
+// The controls bind to every effect setting, while the library's state only
+// carries the settings that differ from their defaults.
+function withDefaults(extras: ExtrasOptions | undefined): ExtrasState {
+	const merged = getDefaultExtras();
+	assignDeep(merged, extras);
+	return merged;
+}
 
 interface Gif {
 	url: string | null;
@@ -275,7 +299,7 @@ class Viewer {
 	private updateState() {
 		const state = this.pico.getState();
 		this.settings = state.settings;
-		this.extras = state.extras;
+		this.extras = withDefaults(state.extras);
 	}
 
 	getState() {
