@@ -740,6 +740,50 @@ export const EFFECT_SECTIONS = [
 		title: 'Scene Effects',
 		info: 'Effects that draw additional geometry into the 3D scene alongside the model, with real depth. They draw before the post-processing chain, so fog, outlines and every later effect treat them as part of the scene.',
 		effects: [
+			effect('floor', {
+				title: 'Floor',
+				info: 'A plane under the model with grid lines, a shadow cast from the model and a mirror image of it. The shadow and the reflection redraw the whole model, so animation, deforms, fur and material effects show in both. Both hide while the camera looks at the plate from below.',
+				controls: (c) => [
+					c.toggle('surface', 'Surface', {
+						info: 'Draws the plate surface itself. Off leaves only the grid, the shadow and the reflection.'
+					}),
+					c.toggle('infinite', 'Infinite', {
+						info: 'Extends the plate to the horizon. Ignores size and edge fade.'
+					}),
+					c.slider('offset', 'Offset', -2, 5, 0.01, {}),
+					c.slider('size', 'Size', 0.5, 6, 0.1, {
+						showIf: (e) => !e.floor.infinite,
+						info: "The plate's width as a multiple of the model's footprint."
+					}),
+					c.color('color', 'Color', { showIf: (e) => e.floor.surface !== false }),
+					c.slider('fade', 'Edge Fade', 0, 1, 0.01, { showIf: (e) => !e.floor.infinite }),
+					c.toggle('grid.enabled', 'Grid'),
+					c.slider('grid.spacing', 'Grid Spacing', 0.1, 5, 0.1, {
+						showIf: (e) => !!e.floor.grid?.enabled
+					}),
+					c.slider('grid.thickness', 'Grid Thickness', 0, 8, 0.5, {
+						showIf: (e) => !!e.floor.grid?.enabled
+					}),
+					c.color('grid.color', 'Grid Color', { showIf: (e) => !!e.floor.grid?.enabled }),
+					c.toggle('shadow.enabled', 'Shadow'),
+					...c.vec('shadow.direction', 'Shadow Direction', -1, 1, 0.01, {
+						showIf: (e) => !!e.floor.shadow?.enabled,
+						info: 'The direction the shadow is cast along. It must point down to reach the plate.'
+					}),
+					c.color('shadow.color', 'Shadow Color', { showIf: (e) => !!e.floor.shadow?.enabled }),
+					c.slider('shadow.strength', 'Shadow Strength', 0, 1, 0.01, {
+						showIf: (e) => !!e.floor.shadow?.enabled
+					}),
+					c.slider('shadow.softness', 'Shadow Softness', 0, 3, 0.01, {
+						showIf: (e) => !!e.floor.shadow?.enabled
+					}),
+					c.toggle('reflection.enabled', 'Reflection'),
+					c.slider('reflection.strength', 'Reflection Strength', 0, 1, 0.01, {
+						showIf: (e) => !!e.floor.reflection?.enabled
+					}),
+					c.style()
+				]
+			}),
 			effect('wireframe', {
 				title: 'Wireframe',
 				info: "Draws the model's triangle edges as lines.",
