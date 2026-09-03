@@ -643,6 +643,64 @@ export const EFFECT_SECTIONS = [
 					c.slider('shrink', 'Shrink', 0, 1, 0.01)
 				]
 			}),
+			effect('vertexGlitch', {
+				title: 'Vertex Glitch',
+				info: 'Rhythmic mesh spikes. Every beat picks random triangles or vertices and pushes them out for a moment. Triangle mode spikes whole triangles along their normal and tears the mesh, vertex mode moves shared corners together.',
+				controls: (c) => [
+					c.mask(),
+					c.nodes(),
+					c.slider('progress', 'Progress', 0, 1, 0.01, {
+						showIf: (e) => !e.vertexGlitch.cycle?.enabled
+					}),
+					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
+					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
+						showIf: (e) => !!e.vertexGlitch.cycle?.enabled
+					}),
+					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
+						showIf: (e) => !!e.vertexGlitch.cycle?.enabled
+					}),
+					c.select('sweep.mode', 'Sweep', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
+					c.slider('sweep.scale', 'Sweep Scale', 0, 20, 0.01, {
+						showIf: (e) => e.vertexGlitch.sweep?.mode === 'noise'
+					}),
+					...c.vec('sweep.direction', 'Sweep Direction', -1, 1, 0.01, {
+						showIf: (e) => e.vertexGlitch.sweep?.mode === 'directional'
+					}),
+					...c.vec('sweep.point', 'Sweep Point', -1, 1, 0.01, {
+						showIf: (e) => e.vertexGlitch.sweep?.mode === 'point'
+					}),
+					c.slider('sweep.softness', 'Sweep Softness', 0, 1, 0.01, {
+						showIf: (e) => e.vertexGlitch.sweep?.mode !== 'uniform'
+					}),
+					c.slider('sweep.wave', 'Sweep Wave', 0, 1, 0.01, {
+						showIf: (e) => hasWave(e.vertexGlitch.sweep?.mode),
+						info: SWEEP_WAVE_INFO
+					}),
+					c.toggle('sweep.invert', 'Sweep Invert', { info: SWEEP_INVERT_INFO }),
+					c.select(
+						'unit',
+						'Unit',
+						[
+							{ value: 'triangle', label: 'Triangle' },
+							{ value: 'vertex', label: 'Vertex' }
+						],
+						{
+							info: 'Triangle spikes whole triangles along their normal and hides the wireframe and fur. Vertex moves shared corners together so the mesh stays welded and the wireframe and fur follow.'
+						}
+					),
+					c.slider('strength', 'Strength', 0, 2, 0.01),
+					c.slider('rate', 'Rate', 0, 30, 1, { info: 'Beats per second.' }),
+					c.slider('density', 'Density', 0, 1, 0.01, {
+						info: 'The fraction of triangles or vertices that spike each beat.'
+					}),
+					c.slider('duration', 'Duration', 0, 1, 0.01, {
+						info: 'How many seconds a spike lasts within its beat.'
+					}),
+					c.slider('softness', 'Softness', 0, 1, 0.01, {
+						info: '0 snaps to the spike and back, 1 eases out and back over the whole spike.'
+					})
+				]
+			}),
 			effect('fur', {
 				title: 'Fur',
 				info: 'Grows shell-textured fur by redrawing the model as a stack of offset shells carved into strands. Fur only grows where the surface is painted with the masked colors, and it follows mesh deforms and dissolves.',
