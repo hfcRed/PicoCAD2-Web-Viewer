@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { RENDER_MODE, SHADING_MODE } from 'picocad2-web';
 	import { viewer } from '../viewer-state.svelte';
 	import { hexToRGB, rgbToHex } from '../utils';
 	import NumericControl from '$lib/components/NumericControl.svelte';
@@ -74,9 +75,9 @@
 				() => viewer.settings.renderMode, (v) => viewer.update((pico) => (pico.renderMode = v))
 			}
 		>
-			<option value="texture">Texture</option>
-			<option value="color">Color</option>
-			<option value="none">None</option>
+			<option value={RENDER_MODE.texture}>Texture</option>
+			<option value={RENDER_MODE.color}>Color</option>
+			<option value={RENDER_MODE.none}>None</option>
 		</select>
 	</label>
 	<label class="form-margin">
@@ -84,7 +85,8 @@
 			type="checkbox"
 			role="switch"
 			bind:checked={
-				() => viewer.settings.shading, (v) => viewer.update((pico) => (pico.shading = v))
+				() => viewer.settings.shadingMode !== SHADING_MODE.off,
+				(v) => viewer.update((pico) => (pico.shadingMode = v ? SHADING_MODE.on : SHADING_MODE.off))
 			}
 		/>
 		Shading
@@ -244,7 +246,7 @@
 			max={5}
 			step={0.1}
 			bind:value={
-				() => viewer.settings.animation.speed,
+				() => viewer.settings.animationSpeed,
 				(v) => viewer.update((pico) => (pico.animation.speed = v))
 			}
 		/>
@@ -263,7 +265,7 @@
 				type="checkbox"
 				role="switch"
 				bind:checked={
-					() => viewer.settings.animation.loop,
+					() => viewer.settings.animationLoop,
 					(v) => viewer.update((pico) => (pico.animation.loop = v))
 				}
 			/>

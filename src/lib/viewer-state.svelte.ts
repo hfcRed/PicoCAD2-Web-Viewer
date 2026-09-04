@@ -2,39 +2,21 @@ import {
 	PicoCAD2Viewer,
 	PicoCAD2Context,
 	getDefaultExtras,
+	getDefaultModelSettings,
+	getDefaultViewerSettings,
+	mergeDefaults,
+	type ModelSettings,
 	type ViewerSettings,
-	type ExtrasOptions,
 	type ExtrasState,
 	type PicoCAD2ViewerState,
 	type RenderStats,
 	type CameraMode
 } from 'picocad2-web';
-import { DEFAULT_SETTINGS, CAMERA_LIMITS } from './constants';
+import { CAMERA_LIMITS } from './constants';
 
 type Stats = RenderStats & { fps: number };
 
-const isObject = (value: unknown): value is Record<string, unknown> =>
-	typeof value === 'object' && value !== null && !Array.isArray(value);
-
-function assignDeep(target: Record<string, unknown>, source: unknown) {
-	if (!isObject(source)) return;
-	for (const [key, value] of Object.entries(source)) {
-		const current = target[key];
-		if (isObject(value) && isObject(current)) {
-			assignDeep(current, value);
-		} else {
-			target[key] = value;
-		}
-	}
-}
-
-// The controls bind to every effect setting, while the library's state only
-// carries the settings that differ from their defaults.
-function withDefaults(extras: ExtrasOptions | undefined): ExtrasState {
-	const merged = getDefaultExtras();
-	assignDeep(merged, extras);
-	return merged;
-}
+type AppSettings = ModelSettings & ViewerSettings;
 
 interface Gif {
 	url: string | null;
@@ -57,7 +39,10 @@ interface LoadRequest {
 }
 
 class Viewer {
-	settings = $state<ViewerSettings>({ ...DEFAULT_SETTINGS });
+	settings = $state<AppSettings>({
+		...getDefaultModelSettings(),
+		...getDefaultViewerSettings()
+	});
 	extras = $state<ExtrasState>(getDefaultExtras());
 	meshNames = $state<SceneNodeEntry[]>([]);
 	animationDuration = $state(0);
@@ -175,14 +160,16 @@ class Viewer {
 			}
 
 			if (keepSettings && currentState) {
-				const newState = this.pico.getState();
+				const model = {
+					...currentState.model,
+					animation: { ...currentState.model?.animation, time: 0 }
+				};
+
+				delete model.bookmark;
 				this.pico.setState({
-					source: newState.source,
-					settings: {
-						...currentState.settings,
-						animation: { ...currentState.settings.animation, time: 0 },
-						bookmark: newState.settings.bookmark
-					},
+					source: this.pico.getState().source,
+					model,
+					viewer: currentState.viewer,
 					extras: currentState.extras
 				});
 			}
@@ -298,8 +285,13 @@ class Viewer {
 
 	private updateState() {
 		const state = this.pico.getState();
-		this.settings = state.settings;
-		this.extras = withDefaults(state.extras);
+		const fileSettings = this.pico.modelInfo?.settings ?? getDefaultModelSettings();
+
+		this.settings = {
+			...mergeDefaults(fileSettings, state.model),
+			...mergeDefaults(getDefaultViewerSettings(), state.viewer)
+		};
+		this.extras = mergeDefaults(getDefaultExtras(), state.extras);
 	}
 
 	getState() {
