@@ -9,6 +9,7 @@ import {
 	type ViewerSettings,
 	type ExtrasState,
 	type PicoCAD2ViewerState,
+	type RawGraphNode,
 	type RenderStats,
 	type CameraMode
 } from 'picocad2-web';
@@ -246,28 +247,18 @@ class Viewer {
 			return;
 		}
 
-		try {
-			// getState() returns the source as a parsed object despite the
-			// string type, so handle both forms.
-			const raw = typeof source === 'string' ? JSON.parse(source) : source;
-			const entries: SceneNodeEntry[] = [];
-			const listed = (name: string) => entries.some((e) => e.name === name);
-			const walk = (
-				node: { name?: string; mesh?: unknown; children?: unknown[] },
-				depth: number
-			) => {
-				// Effects match by name, so a repeated name is listed once, at
-				// its first (shallowest) occurrence.
-				if (node.name && !listed(node.name)) {
-					entries.push({ name: node.name, depth, group: !node.mesh });
-				}
-				for (const child of node.children ?? []) walk(child as typeof node, depth + 1);
-			};
-			for (const child of raw.graph?.children ?? []) walk(child, 0);
-			this.meshNames = entries;
-		} catch {
-			this.meshNames = [];
-		}
+		const entries: SceneNodeEntry[] = [];
+		const listed = (name: string) => entries.some((e) => e.name === name);
+		const walk = (node: RawGraphNode, depth: number) => {
+			// Effects match by name, so a repeated name is listed once, at
+			// its first (shallowest) occurrence.
+			if (node.name && !listed(node.name)) {
+				entries.push({ name: node.name, depth, group: !node.mesh });
+			}
+			for (const child of node.children ?? []) walk(child, depth + 1);
+		};
+		for (const child of source.graph.children ?? []) walk(child, 0);
+		this.meshNames = entries;
 	}
 
 	update(fn: (pico: PicoCAD2Viewer) => void) {

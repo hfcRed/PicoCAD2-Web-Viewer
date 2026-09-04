@@ -59,7 +59,7 @@
 
 	// Clear saved models if compressed state format changes
 	onMount(() => {
-		const currentVersion = '2';
+		const currentVersion = '3';
 		const oldVersion = localStorage.getItem('version');
 
 		if (!oldVersion || oldVersion !== currentVersion) {

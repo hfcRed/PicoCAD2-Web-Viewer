@@ -1,6 +1,6 @@
 import type { Color3, ExtrasState } from 'picocad2-web';
 
-export type EffectKey = Exclude<keyof ExtrasState, 'crt'>;
+export type EffectKey = keyof ExtrasState;
 
 export interface SelectOption {
 	value: string | number;
