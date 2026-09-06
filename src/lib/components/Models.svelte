@@ -23,9 +23,9 @@
 
 	let savedSelected = $derived(savedModels?.current.find((model) => model.selected));
 
-	function saveModel() {
+	async function saveModel() {
 		const state = compressState(viewer.getState());
-		const image = viewer.getImage();
+		const image = await viewer.getImage();
 
 		const existingIndex = savedModels.current.findIndex((model) => model.name === viewer.name);
 		if (existingIndex !== -1) {

@@ -289,7 +289,9 @@ class Viewer {
 		return this.pico?.getState();
 	}
 
-	getImage() {
+	async getImage() {
+		await this.pico.whenReady();
+		this.pico.draw();
 		return this.pico.toDataURL();
 	}
 
@@ -369,6 +371,8 @@ class Viewer {
 		this.pico.stopRenderLoop();
 		this.pico.disableCameraControls();
 		this.recordingCancelled = false;
+
+		await this.pico.whenReady();
 
 		const bgIsTransparent = backgroundColor.every(
 			(c, i) => Math.fround(c) === Math.fround(transparentColor[i])
