@@ -403,6 +403,73 @@ export const EFFECT_SECTIONS = [
 					c.style()
 				]
 			}),
+			effect('display', {
+				title: 'Display',
+				info: 'Turns the selected parts into screens with a video effect simulation. In UV space the surface is the screen and its texels are the pixels. In screen space the structure follows the output pixels.',
+				controls: (c) => [
+					c.mask(),
+					c.nodes(),
+					c.select(
+						'space',
+						'Space',
+						[
+							{ value: 'uv', label: 'UV' },
+							{ value: 'screen', label: 'Screen' }
+						],
+						{
+							info: 'UV lays the pixel grid on the texture, so scanlines follow texel rows and a coarser resolution shows a coarser image. Screen follows the output pixels without resampling.'
+						}
+					),
+					c.select('screenType', 'Screen Type', [
+						{ value: 'crt', label: 'CRT' },
+						{ value: 'lcd', label: 'LCD' },
+						{ value: 'tn', label: 'TN' },
+						{ value: 'oled', label: 'OLED' },
+						{ value: 'gameboy', label: 'Gameboy' },
+						{ value: 'projector', label: 'Projector' }
+					]),
+					c.slider('resolution', 'Resolution', 0, 256, 1, {
+						info: 'Virtual pixels along the texture or screen height. 128 is one per texel. 0 disables the grid.'
+					}),
+					c.slider('brightness', 'Brightness', 0, 2, 0.01),
+					c.slider('saturation', 'Saturation', 0, 2, 0.01),
+					c.slider('contrastBoost', 'Contrast Boost', 0, 1, 0.01),
+					c.slider('gridStrength', 'Grid Strength', 0, 1, 0.01),
+					c.slider('crt.scanlineIntensity', 'Scanline Intensity', 0, 1, 0.01, {
+						showIf: (e) => e.display.screenType === 'crt'
+					}),
+					c.slider('crt.refreshRate', 'Refresh Rate', 0, 10, 0.1, {
+						showIf: (e) => e.display.screenType === 'crt',
+						info: 'Rolling refresh flickers per second. 0 disables the flicker.'
+					}),
+					c.select(
+						'gameboy.palette',
+						'Palette',
+						[
+							{ value: 'dmg', label: 'DMG' },
+							{ value: 'pocket', label: 'Pocket' },
+							{ value: 'custom', label: 'Custom' }
+						],
+						{ showIf: (e) => e.display.screenType === 'gameboy' }
+					),
+					c.colorList('gameboy.customColors', 'Shade', {
+						showIf: (e) =>
+							e.display.screenType === 'gameboy' && e.display.gameboy?.palette === 'custom'
+					}),
+					c.slider('tn.angleShift', 'Angle Shift', 0, 1, 0.01, {
+						showIf: (e) => e.display.screenType === 'tn'
+					}),
+					c.slider('oled.blackCrush', 'Black Crush', 0, 1, 0.01, {
+						showIf: (e) => e.display.screenType === 'oled'
+					}),
+					c.toggle('oled.pentile', 'Pentile', {
+						showIf: (e) => e.display.screenType === 'oled'
+					}),
+					c.slider('projector.hotspot', 'Hotspot', 0, 1, 0.01, {
+						showIf: (e) => e.display.screenType === 'projector'
+					})
+				]
+			}),
 			effect('interior', {
 				title: 'Interior',
 				info: 'Fakes depth behind the masked palette colors by marching into the surface and sampling a procedural pattern at several depths, with parallax that tracks the camera.',
