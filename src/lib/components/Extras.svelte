@@ -104,6 +104,27 @@
 	{/if}
 {/snippet}
 
+<fieldset>
+	<div class="effect">
+		<label>
+			Transparency
+			<select
+				bind:value={
+					() => viewer.settings.transparency,
+					(v) => viewer.update((pico) => (pico.transparency = v))
+				}
+			>
+				<option value="dithered">Dithered</option>
+				<option value="smooth">Smooth</option>
+			</select>
+		</label>
+		<EffectInfo
+			description="How every fade against the background renders. The dissolve, the floor edge and its grid, shadow and reflection without a surface, twinkling particles, and the outlines around them. Dithered removes whole pixels through an ordered dither, so the image stays palette-pure and fades are still visible in GIFs with a transparent background. Smooth blends real alpha, which looks better over an opaque background. GIFs have no alpha and drop every partially transparent pixel, so recording over a transparent background always forces dithered fades and switches back afterwards."
+		/>
+	</div>
+</fieldset>
+<hr />
+
 {#each EFFECT_SECTIONS as section, sectionIndex (section.title)}
 	<div class="effect">
 		<h3>{section.title}</h3>

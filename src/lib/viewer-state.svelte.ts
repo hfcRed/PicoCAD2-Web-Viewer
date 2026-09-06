@@ -354,11 +354,13 @@ class Viewer {
 		const savedOmega = this.pico.camera.omega;
 		const savedAnimTime = this.pico.animation.time;
 		const savedAnimPlaying = this.pico.animation.playing;
+		const savedTransparency = this.pico.transparency;
 
 		this.restoreAfterRecording = () => {
 			this.pico.camera.omega = savedOmega;
 			this.pico.animation.setTime(savedAnimTime);
 			this.pico.animation.playing = savedAnimPlaying;
+			this.pico.transparency = savedTransparency;
 			this.pico.startRenderLoop();
 			this.pico.enableCameraControls();
 			this.restoreAfterRecording = null;
@@ -367,6 +369,11 @@ class Viewer {
 		this.pico.stopRenderLoop();
 		this.pico.disableCameraControls();
 		this.recordingCancelled = false;
+
+		const bgIsTransparent = backgroundColor.every(
+			(c, i) => Math.fround(c) === Math.fround(transparentColor[i])
+		);
+		if (bgIsTransparent) this.pico.transparency = 'dithered';
 
 		const frozenOffset = this.pico.camera.omegaOffset;
 		const frameDt = 1 / fps;

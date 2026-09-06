@@ -814,28 +814,36 @@ export const EFFECT_SECTIONS = [
 			}),
 			effect('particles', {
 				title: 'Particles',
-				info: 'Stateless looping particles floating around the model in a volume scaled to its bounds. The motion style layers drifting, orbiting or straight movement on top of the constant velocity.',
+				info: 'Stateless looping particles filling a cube around the camera. The motion style layers drifting, orbiting or straight movement on top of the constant velocity.',
 				controls: (c) => [
 					c.maskAt('paletteIndices', 'Particle Colors', {
 						info: 'Particles pick a random color from the selection, or render white when nothing is selected.'
 					}),
-					c.slider('count', 'Count', 0, 2000, 10),
+					c.slider('count', 'Count', 0, 10000, 50),
 					c.select('shape', 'Shape', [
 						{ value: 'pixel', label: 'Pixel' },
 						{ value: 'quad', label: 'Quad' },
 						{ value: 'cube', label: 'Cube' },
-						{ value: 'triangle', label: 'Triangle' }
+						{ value: 'triangle', label: 'Triangle' },
+						{ value: 'line', label: 'Line' },
+						{ value: 'circle', label: 'Circle' }
 					]),
 					c.select('motion', 'Motion', [
 						{ value: 'drift', label: 'Drift' },
 						{ value: 'orbit', label: 'Orbit' },
 						{ value: 'linear', label: 'Linear' }
 					]),
-					c.slider('size', 'Size', 0, 10, 0.1),
+					c.slider('size', 'Size', 0, 10, 0.1, {
+						info: 'Output pixels for the pixel shape, world units otherwise. The length of a line streak.'
+					}),
 					c.slider('sizeJitter', 'Size Jitter', 0, 1, 0.01),
 					c.slider('speed', 'Speed', 0, 10, 0.1),
-					...c.vec('velocity', 'Velocity', -1, 1, 0.01),
-					c.slider('areaScale', 'Area Scale', 0.1, 5, 0.1),
+					...c.vec('velocity', 'Velocity', -1, 1, 0.01, {
+						info: 'Constant movement in box lengths per second. Line streaks point along it.'
+					}),
+					c.slider('areaScale', 'Area Scale', 0.5, 20, 0.5, {
+						info: "The edge of the particle cube around the camera, as a multiple of the model's largest extent."
+					}),
 					c.slider('twinkle', 'Twinkle', 0, 1, 0.01),
 					c.toggle('randomHue', 'Random Hue', {
 						info: 'Gives each particle a random hue shift within the hue range.'
