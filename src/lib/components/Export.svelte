@@ -58,8 +58,7 @@
 	}
 
 	$effect(() => {
-		void viewer.settings;
-		void viewer.extras;
+		void viewer.revision;
 
 		generatedLink = '';
 		embedLink = '';

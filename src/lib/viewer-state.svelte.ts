@@ -39,6 +39,45 @@ interface LoadRequest {
 	name?: string;
 }
 
+const UI_SYNC_INTERVAL = 100;
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		!Array.isArray(value) &&
+		!ArrayBuffer.isView(value)
+	);
+}
+
+function sameValue(a: unknown, b: unknown): boolean {
+	if (a === b) return true;
+
+	if (Array.isArray(a) && Array.isArray(b)) {
+		return a.length === b.length && a.every((v, i) => sameValue(v, b[i]));
+	}
+
+	if (isPlainObject(a) && isPlainObject(b)) {
+		const keys = Object.keys(a);
+		return keys.length === Object.keys(b).length && keys.every((k) => sameValue(a[k], b[k]));
+	}
+
+	return false;
+}
+
+function patchState<T extends object>(target: T, source: Partial<T>) {
+	for (const key of Object.keys(source) as (keyof T)[]) {
+		const next = source[key];
+		const current = target[key];
+
+		if (isPlainObject(next) && isPlainObject(current)) {
+			patchState<Record<string, unknown>>(current, next);
+		} else if (!sameValue(current, next)) {
+			target[key] = next as T[keyof T];
+		}
+	}
+}
+
 class Viewer {
 	settings = $state<AppSettings>({
 		...getDefaultModelSettings(),
@@ -51,6 +90,7 @@ class Viewer {
 	loaded = $state(false);
 	name = $state('untitled');
 	usingCustomResolution = $state(false);
+	revision = $state(0);
 
 	gif = $state<Gif>({
 		url: null,
@@ -181,6 +221,7 @@ class Viewer {
 		}
 
 		let lastTime = performance.now();
+		let lastSync = 0;
 		let frameCount = 0;
 
 		this.pico.onFrame = () => {
@@ -193,26 +234,14 @@ class Viewer {
 				frameCount = 0;
 			}
 
-			this.stats = { ...this.context.stats, fps: this.stats.fps };
-
-			const { rotation, tilt, distance } = CAMERA_LIMITS;
-
-			this.settings.animation.time = this.pico.animation.time;
-			this.animationDuration = this.pico.modelInfo?.animationDuration ?? 0;
-			this.settings.camera = {
-				omega: ((this.pico.camera.omega % rotation.max) + rotation.max) % rotation.max,
-				theta: Math.max(tilt.min, Math.min(tilt.max, this.pico.camera.theta)),
-				distanceToTarget: Math.max(
-					distance.min,
-					Math.min(distance.max, this.pico.camera.distanceToTarget)
-				),
-				target: [...this.pico.camera.target] as [number, number, number],
-				zoom: this.pico.camera.zoom
-			};
+			if (now - lastSync < UI_SYNC_INTERVAL) return;
+			lastSync = now;
+			this.syncFromViewer();
 		};
 
 		this.loaded = true;
 		this.updateState();
+		this.syncFromViewer();
 		this.updateMeshNames();
 
 		if (this.settings.resolution.width !== this.settings.resolution.height) {
@@ -261,6 +290,24 @@ class Viewer {
 		this.meshNames = entries;
 	}
 
+	private syncFromViewer() {
+		patchState(this.stats, this.context.stats);
+
+		const { rotation, tilt, distance } = CAMERA_LIMITS;
+		const camera = this.pico.camera;
+
+		this.settings.animation.time = this.pico.animation.time;
+		this.animationDuration = this.pico.modelInfo?.animationDuration ?? 0;
+
+		patchState(this.settings.camera, {
+			omega: ((camera.omega % rotation.max) + rotation.max) % rotation.max,
+			theta: Math.max(tilt.min, Math.min(tilt.max, camera.theta)),
+			distanceToTarget: Math.max(distance.min, Math.min(distance.max, camera.distanceToTarget)),
+			target: [camera.target[0], camera.target[1], camera.target[2]],
+			zoom: camera.zoom
+		});
+	}
+
 	update(fn: (pico: PicoCAD2Viewer) => void) {
 		if (!this.loaded) return;
 		fn(this.pico);
@@ -278,11 +325,12 @@ class Viewer {
 		const state = this.pico.getState();
 		const fileSettings = this.pico.modelInfo?.settings ?? getDefaultModelSettings();
 
-		this.settings = {
+		patchState(this.settings, {
 			...mergeDefaults(fileSettings, state.model),
 			...mergeDefaults(getDefaultViewerSettings(), state.viewer)
-		};
-		this.extras = mergeDefaults(getDefaultExtras(), state.extras);
+		});
+		patchState(this.extras, mergeDefaults(getDefaultExtras(), state.extras));
+		this.revision++;
 	}
 
 	getState() {
