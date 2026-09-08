@@ -94,7 +94,10 @@
 
 <div class={{ 'grid-container': true, container: viewer.usingCustomResolution }}>
 	<div class="canvas-container">
-		<div class="canvas-wrapper">
+		<div
+			class="canvas-wrapper"
+			data-theme={viewer.settings.colorScheme === 'auto' ? undefined : viewer.settings.colorScheme}
+		>
 			<canvas class={{ 'custom-resolution': viewer.usingCustomResolution }} {@attach attachViewer}
 			></canvas>
 			{#if !viewer.loaded}

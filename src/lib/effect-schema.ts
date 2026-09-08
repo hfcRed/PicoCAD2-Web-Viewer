@@ -105,6 +105,12 @@ interface BaseBuilders<T> {
 		extra?: Extra
 	): Control;
 	toggle<P extends string>(path: PathOf<T, P, boolean>, label: string, extra?: Extra): Control;
+	group<P extends string>(
+		path: PathOf<T, P, object>,
+		title: string,
+		controls: Control[],
+		extra?: Extra
+	): Control;
 	maskAt<P extends string>(
 		path: PathOf<T, P, readonly number[]>,
 		title: string,
@@ -249,6 +255,13 @@ const BUILDERS = {
 		label,
 		...extra
 	}),
+	group: (path: string, title: string, controls: Control[], extra: Extra = {}): Control => ({
+		kind: 'group',
+		path,
+		title,
+		controls,
+		...extra
+	}),
 	mask: (extra: Extra = {}): Control => ({ kind: 'mask', path: 'maskedColors', ...extra }),
 	maskAt: (path: string, title: string, extra: Extra = {}): Control => ({
 		kind: 'mask',
@@ -274,11 +287,8 @@ function progressBuilders(key: EffectKey) {
 	return {
 		progress: (): Control =>
 			BUILDERS.slider('progress', 'Progress', 0, 1, 0.01, { showIf: (e) => !cycling(e) }),
-		cycle: (): Control => ({
-			kind: 'group',
-			path: 'cycle',
-			title: 'Cycle',
-			controls: [
+		cycle: (): Control =>
+			BUILDERS.group('cycle', 'Cycle', [
 				BUILDERS.toggle('cycle.enabled', 'Enabled', { info: CYCLE_INFO }),
 				BUILDERS.select('cycle.mode', 'Mode', CYCLE_MODE_OPTIONS, {
 					showIf: cycling,
@@ -286,13 +296,9 @@ function progressBuilders(key: EffectKey) {
 				}),
 				BUILDERS.slider('cycle.duration', 'Duration', 0.1, 20, 0.1, { showIf: cycling }),
 				BUILDERS.slider('cycle.hold', 'Hold', 0, 10, 0.1, { showIf: cycling })
-			]
-		}),
-		sweep: (): Control => ({
-			kind: 'group',
-			path: 'sweep',
-			title: 'Sweep',
-			controls: [
+			]),
+		sweep: (): Control =>
+			BUILDERS.group('sweep', 'Sweep', [
 				BUILDERS.select('sweep.mode', 'Mode', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
 				BUILDERS.slider('sweep.scale', 'Scale', 0, 20, 0.01, {
 					showIf: (e) => sweepMode(e) === 'noise'
@@ -311,8 +317,7 @@ function progressBuilders(key: EffectKey) {
 					info: SWEEP_WAVE_INFO
 				}),
 				BUILDERS.toggle('sweep.invert', 'Invert', { info: SWEEP_INVERT_INFO })
-			]
-		})
+			])
 	};
 }
 
@@ -876,6 +881,17 @@ export const EFFECT_SECTIONS = [
 					c.slider('size', 'Width', 0, 10, 1),
 					c.color('colorFrom', 'Color'),
 					c.color('colorTo', 'Gradient Color'),
+					c.group('dark', 'Dark Mode', [
+						c.toggle('dark.enabled', 'Enabled', {
+							info: 'Uses a second color pair while the viewer color mode is dark, so an outline over a transparent background can match a page with light and dark modes. See Color Mode at the top of this panel.'
+						}),
+						c.color('dark.colorFrom', 'Color', {
+							showIf: (e) => e.gradientOutline.dark?.enabled === true
+						}),
+						c.color('dark.colorTo', 'Gradient Color', {
+							showIf: (e) => e.gradientOutline.dark?.enabled === true
+						})
+					]),
 					c.slider('gradient', 'Gradient Strength', 0, 10, 0.01),
 					c.slider('gradientDirection', 'Gradient Direction', 0, Math.PI * 2, 0.01),
 					c.select('mode', 'Mode', [

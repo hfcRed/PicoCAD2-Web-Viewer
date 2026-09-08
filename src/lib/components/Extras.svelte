@@ -122,6 +122,23 @@
 			description="How every fade against the background renders. The dissolve, the floor edge and its grid, shadow and reflection without a surface, twinkling particles, and the outlines around them. Dithered removes whole pixels through an ordered dither, so the image stays palette-pure and fades are still visible in GIFs with a transparent background. Smooth blends real alpha, which looks better over an opaque background. GIFs have no alpha and drop every partially transparent pixel, so recording over a transparent background always forces dithered fades and switches back afterwards."
 		/>
 	</div>
+	<div class="effect">
+		<label>
+			Color Mode
+			<select
+				bind:value={
+					() => viewer.settings.colorScheme, (v) => viewer.update((pico) => (pico.colorScheme = v))
+				}
+			>
+				<option value="light">Light</option>
+				<option value="dark">Dark</option>
+				<option value="auto">Auto</option>
+			</select>
+		</label>
+		<EffectInfo
+			description="Which mode the viewer renders for. Effects with a dark variant, currently the gradient outline's Dark Mode colors, switch to it while the mode is dark. Auto follows the browser's light or dark mode. Saved in the viewer state, so a website embedding the model can set it from its own theme."
+		/>
+	</div>
 </fieldset>
 <hr />
 
