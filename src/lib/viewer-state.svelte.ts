@@ -11,7 +11,8 @@ import {
 	type PicoCAD2ViewerState,
 	type RawGraphNode,
 	type RenderStats,
-	type CameraMode
+	type CameraMode,
+	type DeepReadonly
 } from 'picocad2-web';
 import { CAMERA_LIMITS } from './constants';
 
@@ -278,7 +279,7 @@ class Viewer {
 
 		const entries: SceneNodeEntry[] = [];
 		const listed = (name: string) => entries.some((e) => e.name === name);
-		const walk = (node: RawGraphNode, depth: number) => {
+		const walk = (node: DeepReadonly<RawGraphNode>, depth: number) => {
 			// Effects match by name, so a repeated name is listed once, at
 			// its first (shallowest) occurrence.
 			if (node.name && !listed(node.name)) {

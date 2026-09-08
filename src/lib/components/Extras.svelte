@@ -149,10 +149,24 @@
 			{#if bool(effect.key, 'enabled')}
 				{#each effect.controls as control (control.path)}
 					{#if !control.showIf || control.showIf(viewer.extras)}
-						<div class="effect">
-							<div>{@render controlInput(effect.key, control)}</div>
-							<EffectInfo description={control.info} />
-						</div>
+						{#if control.kind === 'group'}
+							<fieldset class="group">
+								<legend>{control.title}</legend>
+								{#each control.controls as inner (inner.path)}
+									{#if !inner.showIf || inner.showIf(viewer.extras)}
+										<div class="effect">
+											<div>{@render controlInput(effect.key, inner)}</div>
+											<EffectInfo description={inner.info} />
+										</div>
+									{/if}
+								{/each}
+							</fieldset>
+						{:else}
+							<div class="effect">
+								<div>{@render controlInput(effect.key, control)}</div>
+								<EffectInfo description={control.info} />
+							</div>
+						{/if}
 					{/if}
 				{/each}
 			{/if}
@@ -181,6 +195,19 @@
 
 	fieldset {
 		margin-bottom: 0 !important;
+	}
+
+	.group {
+		border: calc(var(--pico-border-width) * 2) solid var(--pico-form-element-border-color);
+		border-radius: var(--pico-border-radius);
+		padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+		margin-bottom: var(--pico-spacing) !important;
+	}
+
+	.group legend {
+		padding: 0 calc(var(--pico-form-element-spacing-horizontal) / 2);
+		margin-bottom: calc(var(--pico-spacing) * 0.75);
+		font-weight: 600;
 	}
 
 	hr {

@@ -27,7 +27,8 @@ export type Control =
 	| ({ kind: 'toggle'; label: string } & ControlBase)
 	| ({ kind: 'mask'; title?: string } & ControlBase)
 	| ({ kind: 'meshes'; title?: string } & ControlBase)
-	| ({ kind: 'paletteMap' } & ControlBase);
+	| ({ kind: 'paletteMap' } & ControlBase)
+	| ({ kind: 'group'; title: string; controls: Control[] } & ControlBase);
 
 export interface EffectSchema {
 	key: EffectKey;
@@ -116,7 +117,10 @@ type ControlBuilders<T> = BaseBuilders<T> &
 	('maskedColors' extends keyof NonNullable<T> ? { mask(extra?: Extra): Control } : unknown) &
 	('nodes' extends keyof NonNullable<T> ? { nodes(): Control } : unknown) &
 	('style' extends keyof NonNullable<T> ? { style(): Control } : unknown) &
-	('modelOnly' extends keyof NonNullable<T> ? { modelOnly(): Control } : unknown);
+	('modelOnly' extends keyof NonNullable<T> ? { modelOnly(): Control } : unknown) &
+	('progress' extends keyof NonNullable<T> ? { progress(): Control } : unknown) &
+	('cycle' extends keyof NonNullable<T> ? { cycle(): Control } : unknown) &
+	('sweep' extends keyof NonNullable<T> ? { sweep(): Control } : unknown);
 
 const NODES_TITLE = 'Meshes';
 
@@ -258,6 +262,60 @@ const BUILDERS = {
 	modelOnly: (): Control => BUILDERS.toggle('modelOnly', 'Model Only', { info: MODEL_ONLY_INFO })
 };
 
+interface ProgressState {
+	cycle?: { enabled?: boolean };
+	sweep?: { mode?: string };
+}
+
+function progressBuilders(key: EffectKey) {
+	const state = (e: ExtrasState) => e[key] as ProgressState;
+	const cycling = (e: ExtrasState) => !!state(e).cycle?.enabled;
+	const sweepMode = (e: ExtrasState) => state(e).sweep?.mode;
+	return {
+		progress: (): Control =>
+			BUILDERS.slider('progress', 'Progress', 0, 1, 0.01, { showIf: (e) => !cycling(e) }),
+		cycle: (): Control => ({
+			kind: 'group',
+			path: 'cycle',
+			title: 'Cycle',
+			controls: [
+				BUILDERS.toggle('cycle.enabled', 'Enabled', { info: CYCLE_INFO }),
+				BUILDERS.select('cycle.mode', 'Mode', CYCLE_MODE_OPTIONS, {
+					showIf: cycling,
+					info: CYCLE_MODE_INFO
+				}),
+				BUILDERS.slider('cycle.duration', 'Duration', 0.1, 20, 0.1, { showIf: cycling }),
+				BUILDERS.slider('cycle.hold', 'Hold', 0, 10, 0.1, { showIf: cycling })
+			]
+		}),
+		sweep: (): Control => ({
+			kind: 'group',
+			path: 'sweep',
+			title: 'Sweep',
+			controls: [
+				BUILDERS.select('sweep.mode', 'Mode', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
+				BUILDERS.slider('sweep.scale', 'Scale', 0, 20, 0.01, {
+					showIf: (e) => sweepMode(e) === 'noise'
+				}),
+				...BUILDERS.vec('sweep.direction', 'Direction', -1, 1, 0.01, {
+					showIf: (e) => sweepMode(e) === 'directional'
+				}),
+				...BUILDERS.vec('sweep.point', 'Point', -1, 1, 0.01, {
+					showIf: (e) => sweepMode(e) === 'point'
+				}),
+				BUILDERS.slider('sweep.softness', 'Softness', 0, 1, 0.01, {
+					showIf: (e) => sweepMode(e) !== 'uniform'
+				}),
+				BUILDERS.slider('sweep.wave', 'Wave', 0, 1, 0.01, {
+					showIf: (e) => hasWave(sweepMode(e)),
+					info: SWEEP_WAVE_INFO
+				}),
+				BUILDERS.toggle('sweep.invert', 'Invert', { info: SWEEP_INVERT_INFO })
+			]
+		})
+	};
+}
+
 function effect<K extends EffectKey>(
 	key: K,
 	def: {
@@ -266,11 +324,12 @@ function effect<K extends EffectKey>(
 		controls: (c: ControlBuilders<ExtrasState[K]>) => Control[];
 	}
 ): EffectSchemaOf<K> {
+	const builders = { ...BUILDERS, ...progressBuilders(key) };
 	return {
 		key,
 		title: def.title,
 		info: def.info,
-		controls: def.controls(BUILDERS as unknown as ControlBuilders<ExtrasState[K]>)
+		controls: def.controls(builders as unknown as ControlBuilders<ExtrasState[K]>)
 	};
 }
 
@@ -307,38 +366,9 @@ export const EFFECT_SECTIONS = [
 				controls: (c) => [
 					c.mask(),
 					c.nodes(),
-					c.slider('progress', 'Progress', 0, 1, 0.01, {
-						showIf: (e) => !e.dissolve.cycle?.enabled
-					}),
-					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
-					c.select('cycle.mode', 'Cycle Mode', CYCLE_MODE_OPTIONS, {
-						showIf: (e) => !!e.dissolve.cycle?.enabled,
-						info: CYCLE_MODE_INFO
-					}),
-					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
-						showIf: (e) => !!e.dissolve.cycle?.enabled
-					}),
-					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
-						showIf: (e) => !!e.dissolve.cycle?.enabled
-					}),
-					c.select('sweep.mode', 'Sweep', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
-					c.slider('sweep.scale', 'Sweep Scale', 0, 20, 0.01, {
-						showIf: (e) => e.dissolve.sweep?.mode === 'noise'
-					}),
-					...c.vec('sweep.direction', 'Sweep Direction', -1, 1, 0.01, {
-						showIf: (e) => e.dissolve.sweep?.mode === 'directional'
-					}),
-					...c.vec('sweep.point', 'Sweep Point', -1, 1, 0.01, {
-						showIf: (e) => e.dissolve.sweep?.mode === 'point'
-					}),
-					c.slider('sweep.softness', 'Sweep Softness', 0, 1, 0.01, {
-						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
-					}),
-					c.slider('sweep.wave', 'Sweep Wave', 0, 1, 0.01, {
-						showIf: (e) => hasWave(e.dissolve.sweep?.mode),
-						info: SWEEP_WAVE_INFO
-					}),
-					c.toggle('sweep.invert', 'Sweep Invert', { info: SWEEP_INVERT_INFO }),
+					c.progress(),
+					c.cycle(),
+					c.sweep(),
 					c.slider('edgeWidth', 'Edge Width', 0, 10, 0.01, {
 						showIf: (e) => e.dissolve.sweep?.mode !== 'uniform'
 					}),
@@ -606,38 +636,9 @@ export const EFFECT_SECTIONS = [
 				info: 'Stackable geometry deforms. Voxel remeshes the model into grid-aligned cubes that keep the color of the surface they replace, and the barrel, spherify and twist warps apply on top, so a voxelized model can still bend. The progress runs the whole deform from untouched to full, and a sweep moves its front across the model.',
 				controls: (c) => [
 					c.nodes(),
-					c.slider('progress', 'Progress', 0, 1, 0.01, {
-						showIf: (e) => !e.meshDeform.cycle?.enabled
-					}),
-					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
-					c.select('cycle.mode', 'Cycle Mode', CYCLE_MODE_OPTIONS, {
-						showIf: (e) => !!e.meshDeform.cycle?.enabled,
-						info: CYCLE_MODE_INFO
-					}),
-					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
-						showIf: (e) => !!e.meshDeform.cycle?.enabled
-					}),
-					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
-						showIf: (e) => !!e.meshDeform.cycle?.enabled
-					}),
-					c.select('sweep.mode', 'Sweep', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
-					c.slider('sweep.scale', 'Sweep Scale', 0, 20, 0.01, {
-						showIf: (e) => e.meshDeform.sweep?.mode === 'noise'
-					}),
-					...c.vec('sweep.direction', 'Sweep Direction', -1, 1, 0.01, {
-						showIf: (e) => e.meshDeform.sweep?.mode === 'directional'
-					}),
-					...c.vec('sweep.point', 'Sweep Point', -1, 1, 0.01, {
-						showIf: (e) => e.meshDeform.sweep?.mode === 'point'
-					}),
-					c.slider('sweep.softness', 'Sweep Softness', 0, 1, 0.01, {
-						showIf: (e) => e.meshDeform.sweep?.mode !== 'uniform'
-					}),
-					c.slider('sweep.wave', 'Sweep Wave', 0, 1, 0.01, {
-						showIf: (e) => hasWave(e.meshDeform.sweep?.mode),
-						info: SWEEP_WAVE_INFO
-					}),
-					c.toggle('sweep.invert', 'Sweep Invert', { info: SWEEP_INVERT_INFO }),
+					c.progress(),
+					c.cycle(),
+					c.sweep(),
 					c.toggle('voxel.enabled', 'Voxel'),
 					c.slider('voxel.gridSize', 'Voxel Grid Size', 0.05, 2, 0.01, {
 						showIf: (e) => e.meshDeform.voxel?.enabled === true
@@ -680,38 +681,9 @@ export const EFFECT_SECTIONS = [
 				controls: (c) => [
 					c.mask(),
 					c.nodes(),
-					c.slider('progress', 'Progress', 0, 1, 0.01, {
-						showIf: (e) => !e.triangleShatter.cycle?.enabled
-					}),
-					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
-					c.select('cycle.mode', 'Cycle Mode', CYCLE_MODE_OPTIONS, {
-						showIf: (e) => !!e.triangleShatter.cycle?.enabled,
-						info: CYCLE_MODE_INFO
-					}),
-					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
-						showIf: (e) => !!e.triangleShatter.cycle?.enabled
-					}),
-					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
-						showIf: (e) => !!e.triangleShatter.cycle?.enabled
-					}),
-					c.select('sweep.mode', 'Sweep', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
-					c.slider('sweep.scale', 'Sweep Scale', 0, 20, 0.01, {
-						showIf: (e) => e.triangleShatter.sweep?.mode === 'noise'
-					}),
-					...c.vec('sweep.direction', 'Sweep Direction', -1, 1, 0.01, {
-						showIf: (e) => e.triangleShatter.sweep?.mode === 'directional'
-					}),
-					...c.vec('sweep.point', 'Sweep Point', -1, 1, 0.01, {
-						showIf: (e) => e.triangleShatter.sweep?.mode === 'point'
-					}),
-					c.slider('sweep.softness', 'Sweep Softness', 0, 1, 0.01, {
-						showIf: (e) => e.triangleShatter.sweep?.mode !== 'uniform'
-					}),
-					c.slider('sweep.wave', 'Sweep Wave', 0, 1, 0.01, {
-						showIf: (e) => hasWave(e.triangleShatter.sweep?.mode),
-						info: SWEEP_WAVE_INFO
-					}),
-					c.toggle('sweep.invert', 'Sweep Invert', { info: SWEEP_INVERT_INFO }),
+					c.progress(),
+					c.cycle(),
+					c.sweep(),
 					c.select('mode', 'Mode', [
 						{ value: 'normal', label: 'Normal' },
 						{ value: 'radial', label: 'Radial' },
@@ -735,38 +707,9 @@ export const EFFECT_SECTIONS = [
 				controls: (c) => [
 					c.mask(),
 					c.nodes(),
-					c.slider('progress', 'Progress', 0, 1, 0.01, {
-						showIf: (e) => !e.vertexGlitch.cycle?.enabled
-					}),
-					c.toggle('cycle.enabled', 'Cycle', { info: CYCLE_INFO }),
-					c.select('cycle.mode', 'Cycle Mode', CYCLE_MODE_OPTIONS, {
-						showIf: (e) => !!e.vertexGlitch.cycle?.enabled,
-						info: CYCLE_MODE_INFO
-					}),
-					c.slider('cycle.duration', 'Cycle Duration', 0.1, 20, 0.1, {
-						showIf: (e) => !!e.vertexGlitch.cycle?.enabled
-					}),
-					c.slider('cycle.hold', 'Cycle Hold', 0, 10, 0.1, {
-						showIf: (e) => !!e.vertexGlitch.cycle?.enabled
-					}),
-					c.select('sweep.mode', 'Sweep', SWEEP_MODE_OPTIONS, { info: SWEEP_MODE_INFO }),
-					c.slider('sweep.scale', 'Sweep Scale', 0, 20, 0.01, {
-						showIf: (e) => e.vertexGlitch.sweep?.mode === 'noise'
-					}),
-					...c.vec('sweep.direction', 'Sweep Direction', -1, 1, 0.01, {
-						showIf: (e) => e.vertexGlitch.sweep?.mode === 'directional'
-					}),
-					...c.vec('sweep.point', 'Sweep Point', -1, 1, 0.01, {
-						showIf: (e) => e.vertexGlitch.sweep?.mode === 'point'
-					}),
-					c.slider('sweep.softness', 'Sweep Softness', 0, 1, 0.01, {
-						showIf: (e) => e.vertexGlitch.sweep?.mode !== 'uniform'
-					}),
-					c.slider('sweep.wave', 'Sweep Wave', 0, 1, 0.01, {
-						showIf: (e) => hasWave(e.vertexGlitch.sweep?.mode),
-						info: SWEEP_WAVE_INFO
-					}),
-					c.toggle('sweep.invert', 'Sweep Invert', { info: SWEEP_INVERT_INFO }),
+					c.progress(),
+					c.cycle(),
+					c.sweep(),
 					c.select(
 						'unit',
 						'Unit',
@@ -948,7 +891,7 @@ export const EFFECT_SECTIONS = [
 						{ showIf: (e) => e.gradientOutline.mode === 'dropShadow' },
 						['X', 'Y']
 					),
-					c.slider('growthDirection', 'Growth Direction', 0, 360, 1, {
+					c.slider('growthDirection', 'Growth Direction', 0, Math.PI * 2, 0.01, {
 						showIf: (e) => e.gradientOutline.mode === 'outline'
 					}),
 					c.slider('growthFactor', 'Growth Factor', 0, 1, 0.01, {
