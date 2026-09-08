@@ -362,12 +362,12 @@ export const EFFECT_SECTIONS = [
 			}),
 			effect('colorCutout', {
 				title: 'Cutout',
-				info: 'Renders the selected palette colors as additional transparent colors. The cutouts are real holes that outlines, depth effects and color masks recognize. Nothing is cut while no colors are selected.',
+				info: 'Renders the selected palette colors as additional transparent colors. The cutouts are real holes that outlines, depth effects and color masks work with. Nothing is cut while no colors are selected.',
 				controls: (c) => [c.mask(), c.nodes()]
 			}),
 			effect('dissolve', {
 				title: 'Dissolve',
-				info: 'Dissolves the model texel by texel as the progress runs from 0 to 1, punching real holes that outlines and depth effects recognize. Survivors near the cut show the edge color as a glowing band, and fur strands dissolve with their base surface.',
+				info: 'Dissolves the model texel by texel as the progress runs from 0 to 1, creating real holes that outlines and depth effects work with. Survivors near the cut show the edge color as a glowing band, and fur strands dissolve with their base surface.',
 				controls: (c) => [
 					c.mask(),
 					c.nodes(),
