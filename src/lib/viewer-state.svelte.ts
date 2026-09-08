@@ -7,6 +7,7 @@ import {
 	mergeDefaults,
 	type ModelSettings,
 	type ViewerSettings,
+	type ColorScheme,
 	type ExtrasState,
 	type PicoCAD2ViewerState,
 	type RawGraphNode,
@@ -85,6 +86,8 @@ class Viewer {
 		...getDefaultViewerSettings()
 	});
 	extras = $state<ExtrasState>(getDefaultExtras());
+	// The page's scheme, not part of the viewer state, so it stays out of cards and links
+	colorScheme = $state<ColorScheme>('auto');
 	meshNames = $state<SceneNodeEntry[]>([]);
 	animationDuration = $state(0);
 	stats = $state<Stats>({ drawCalls: 0, polyCount: 0, fps: 0 });
@@ -118,7 +121,8 @@ class Viewer {
 			context: this.context,
 			resolution: { width: 128, height: 128, scale: 4 },
 			maxFps: 0,
-			clampCameraDistance: { enabled: true, minimumDistance: 2 }
+			clampCameraDistance: { enabled: true, minimumDistance: 2 },
+			colorScheme: this.colorScheme
 		});
 
 		this.setupWorker();
@@ -307,6 +311,11 @@ class Viewer {
 			target: [camera.target[0], camera.target[1], camera.target[2]],
 			zoom: camera.zoom
 		});
+	}
+
+	setColorScheme(scheme: ColorScheme) {
+		this.colorScheme = scheme;
+		this.pico.colorScheme = scheme;
 	}
 
 	update(fn: (pico: PicoCAD2Viewer) => void) {

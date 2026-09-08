@@ -96,7 +96,7 @@
 	<div class="canvas-container">
 		<div
 			class="canvas-wrapper"
-			data-theme={viewer.settings.colorScheme === 'auto' ? undefined : viewer.settings.colorScheme}
+			data-theme={viewer.colorScheme === 'auto' ? undefined : viewer.colorScheme}
 		>
 			<canvas class={{ 'custom-resolution': viewer.usingCustomResolution }} {@attach attachViewer}
 			></canvas>

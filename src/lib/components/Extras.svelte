@@ -125,18 +125,14 @@
 	<div class="effect">
 		<label>
 			Color Mode
-			<select
-				bind:value={
-					() => viewer.settings.colorScheme, (v) => viewer.update((pico) => (pico.colorScheme = v))
-				}
-			>
+			<select bind:value={() => viewer.colorScheme, (v) => viewer.setColorScheme(v)}>
 				<option value="light">Light</option>
 				<option value="dark">Dark</option>
 				<option value="auto">Auto</option>
 			</select>
 		</label>
 		<EffectInfo
-			description="Which mode the viewer renders for. Effects with a dark variant, currently the gradient outline's Dark Mode colors, switch to it while the mode is dark. Auto follows the browser's light or dark mode. Saved in the viewer state, so a website embedding the model can set it from its own theme."
+			description="Which mode the viewer renders for. Effects with a dark variant, currently the gradient outline's Dark Mode colors, switch to it while the mode is dark. Auto follows the browser's light or dark mode. Not saved with the model. A website embedding the model sets it from its own theme."
 		/>
 	</div>
 </fieldset>
