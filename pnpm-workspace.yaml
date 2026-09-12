@@ -3,6 +3,6 @@ allowBuilds:
   sharp: true
   workerd: true
 minimumReleaseAgeExclude:
-  - 2.0.3
+  - picocad2-web@2.0.3
 onlyBuiltDependencies:
   - esbuild
