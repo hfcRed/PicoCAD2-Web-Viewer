@@ -15,6 +15,7 @@ import {
 	type CameraMode,
 	type DeepReadonly
 } from 'picocad2-web';
+import { untrack } from 'svelte';
 import { CAMERA_LIMITS } from './constants';
 
 type Stats = RenderStats & { fps: number };
@@ -115,6 +116,8 @@ class Viewer {
 	private restoreAfterRecording: (() => void) | null = null;
 
 	init(canvas: HTMLCanvasElement) {
+		const colorScheme = untrack(() => this.colorScheme);
+
 		this.context = new PicoCAD2Context();
 		this.pico = new PicoCAD2Viewer({
 			canvas,
@@ -122,7 +125,7 @@ class Viewer {
 			resolution: { width: 128, height: 128, scale: 4 },
 			maxFps: 0,
 			clampCameraDistance: { enabled: true, minimumDistance: 2 },
-			colorScheme: this.colorScheme
+			colorScheme
 		});
 
 		this.setupWorker();
