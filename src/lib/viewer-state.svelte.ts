@@ -12,22 +12,37 @@ import {
 	type PicoCAD2ViewerState,
 	type RawGraphNode,
 	type RenderStats,
-	type CameraMode,
 	type DeepReadonly
 } from 'picocad2-web';
+import {
+	BufferTarget,
+	Mp4OutputFormat,
+	Output,
+	QUALITY_VERY_HIGH,
+	VideoSample,
+	VideoSampleSource,
+	getFirstEncodableVideoCodec
+} from 'mediabunny';
 import { untrack } from 'svelte';
-import { CAMERA_LIMITS } from './constants';
+import { CAMERA_LIMITS, CAPTURE_FPS_LIMITS } from './constants';
 
 type Stats = RenderStats & { fps: number };
 
 type AppSettings = ModelSettings & ViewerSettings;
 
-interface Gif {
+export type CaptureFormat = keyof typeof CAPTURE_FPS_LIMITS;
+
+interface Capture {
 	url: string | null;
 	recording: boolean;
-	time: number;
 	progress: number;
-	initialRotation: number;
+	error: string | null;
+}
+
+interface FrameSink {
+	addFrame: (index: number) => Promise<void> | void;
+	finish: () => Promise<Blob>;
+	cancel: () => Promise<void> | void;
 }
 
 export interface SceneNodeEntry {
@@ -97,12 +112,15 @@ class Viewer {
 	usingCustomResolution = $state(false);
 	revision = $state(0);
 
-	gif = $state<Gif>({
+	capture = $state<Capture>({
 		url: null,
 		recording: false,
-		time: 0,
 		progress: 0,
-		initialRotation: 0
+		error: null
+	});
+	captureSettings = $state<{ format: CaptureFormat; fps: number }>({
+		format: 'gif',
+		fps: 30
 	});
 
 	pendingLoad = $state<LoadRequest | null>(null);
@@ -113,7 +131,7 @@ class Viewer {
 	private worker: Worker | null = null;
 	private workerReady = false;
 	private recordingCancelled = false;
-	private restoreAfterRecording: (() => void) | null = null;
+	private resolveGif: ((data: Uint8Array<ArrayBuffer>) => void) | null = null;
 
 	init(canvas: HTMLCanvasElement) {
 		const colorScheme = untrack(() => this.colorScheme);
@@ -144,20 +162,8 @@ class Viewer {
 			if (e.data.type === 'load') {
 				this.workerReady = true;
 			} else if (e.data.type === 'gif') {
-				const blob = new Blob([e.data.data], { type: 'image/gif' });
-
-				this.gif.url = URL.createObjectURL(blob);
-				this.gif.recording = false;
-				this.gif.progress = 100;
-
-				const link = document.createElement('a');
-				const name = this.name ? this.name.replace(/\.[^/.]+$/, '') : 'model';
-				link.href = this.gif.url ?? '';
-				link.download = `${name}.gif`;
-				link.click();
-				link.remove();
-
-				this.restoreAfterRecording?.();
+				this.resolveGif?.(e.data.data);
+				this.resolveGif = null;
 			}
 		};
 	}
@@ -197,7 +203,7 @@ class Viewer {
 		state?: PicoCAD2ViewerState;
 		keepSettings?: boolean;
 	}) {
-		this.stopGIFRecording();
+		this.stopRecording();
 
 		const currentState = this.loaded ? this.pico.getState() : null;
 		try {
@@ -371,36 +377,34 @@ class Viewer {
 		this.updateState();
 	}
 
-	async startGIFRecording() {
-		if (this.gif.recording || !this.worker || !this.workerReady) return;
+	async startRecording() {
+		if (this.capture.recording) return;
 
-		const cameraMode = this.pico.cameraMode;
+		const format = this.captureSettings.format;
+		if (format === 'gif' && (!this.worker || !this.workerReady)) return;
+
 		const info = this.pico.modelInfo;
 		if (!info) return;
 
 		const { backgroundColor, animationDuration, transparentColor } = info;
 
-		if (this.gif.url) URL.revokeObjectURL(this.gif.url);
+		this.capture.recording = true;
+		this.capture.progress = 0;
+		this.capture.error = null;
 
-		this.gif = {
-			url: null,
-			recording: true,
-			time: 0,
-			progress: 0,
-			initialRotation: this.pico.camera.omega
-		};
-
-		const fps = 30;
+		const { min, max } = CAPTURE_FPS_LIMITS[format];
+		const fps = Math.max(min, Math.min(max, this.captureSettings.fps || 30));
+		const animated = this.pico.animation.playing;
 		const loops = Math.max(1, this.pico.animation.loops);
-		const duration = this.pico.animation.playing
+		const duration = animated
 			? (animationDuration * loops) / this.pico.animation.speed
 			: this.pico.cameraModeSpeed;
-		const totalFrames = Math.ceil(fps * duration);
-		const delay = Math.round((1 / fps) * 1000);
 
-		const direction = this.pico.cameraModeDirection === 'right' ? 1 : -1;
-		const canvasWidth = this.pico.canvas.width;
-		const canvasHeight = this.pico.canvas.height;
+		const totalFrames = Math.max(
+			1,
+			Math.min(Math.round(fps * duration), Math.floor(max * duration))
+		);
+		const frameDuration = duration / totalFrames;
 
 		const bgColor = [
 			Math.round(backgroundColor[0] * 255),
@@ -408,99 +412,160 @@ class Viewer {
 			Math.round(backgroundColor[2] * 255),
 			255
 		];
-		const trColor = [
+		const trColor: [number, number, number] = [
 			Math.round(transparentColor[0] * 255),
 			Math.round(transparentColor[1] * 255),
 			Math.round(transparentColor[2] * 255)
 		];
 
-		const savedOmega = this.pico.camera.omega;
 		const savedAnimTime = this.pico.animation.time;
 		const savedAnimPlaying = this.pico.animation.playing;
 		const savedTransparency = this.pico.transparency;
-
-		this.restoreAfterRecording = () => {
-			this.pico.camera.omega = savedOmega;
-			this.pico.animation.setTime(savedAnimTime);
-			this.pico.animation.playing = savedAnimPlaying;
-			this.pico.transparency = savedTransparency;
-			this.pico.startRenderLoop();
-			this.pico.enableCameraControls();
-			this.restoreAfterRecording = null;
-		};
 
 		this.pico.stopRenderLoop();
 		this.pico.disableCameraControls();
 		this.recordingCancelled = false;
 
-		await this.pico.whenReady();
-
 		const bgIsTransparent = backgroundColor.every(
 			(c, i) => Math.fround(c) === Math.fround(transparentColor[i])
 		);
-		if (bgIsTransparent) this.pico.transparency = 'dithered';
+		if (format === 'gif' && bgIsTransparent) this.pico.transparency = 'dithered';
 
-		const frozenOffset = this.pico.camera.omegaOffset;
-		const frameDt = 1 / fps;
+		try {
+			await this.pico.whenReady();
 
-		for (let i = 0; i < totalFrames; i++) {
-			if (this.recordingCancelled) break;
-			this.pico.advanceTime(frameDt);
+			const sink =
+				format === 'gif'
+					? this.createGifSink(frameDuration, bgColor, trColor)
+					: await this.createVideoSink(fps, frameDuration, bgColor);
 
-			const progress = i / totalFrames;
+			for (let i = 0; i < totalFrames; i++) {
+				if (this.recordingCancelled) break;
 
-			if (this.settings.animation.playing) {
-				this.pico.animation.setTime((progress * animationDuration * loops) % animationDuration);
-			} else {
-				const simulatedOffset = this.computeSimulatedOffset(progress, cameraMode, direction);
-				this.pico.camera.omega = savedOmega - frozenOffset + simulatedOffset;
-				this.pico.camera.rotate(0, 0);
+				this.pico.advanceTime(frameDuration);
+
+				const progress = i / totalFrames;
+
+				if (animated) {
+					this.pico.animation.setTime((progress * animationDuration * loops) % animationDuration);
+				}
+
+				this.pico.draw();
+				await sink.addFrame(i);
+
+				this.capture.progress = Math.round(progress * 100);
+
+				await new Promise((r) => setTimeout(r, 0));
 			}
 
-			this.pico.draw();
-			const pixelData = this.pico.toPixelData();
-
-			this.worker.postMessage({ type: 'frame', data: pixelData }, [pixelData.buffer]);
-
-			this.gif.progress = Math.round(progress * 100);
-			this.gif.time = i / fps;
-
-			await new Promise((r) => setTimeout(r, 0));
-		}
-
-		if (!this.recordingCancelled) {
-			this.worker.postMessage({
-				type: 'generate',
-				width: canvasWidth,
-				height: canvasHeight,
-				delay,
-				background: bgColor,
-				transparentColor: trColor
-			});
-		} else {
-			this.gif.recording = false;
-			this.restoreAfterRecording?.();
+			if (this.recordingCancelled) {
+				await sink.cancel();
+			} else {
+				this.download(await sink.finish(), format === 'gif' ? 'gif' : 'mp4');
+				this.capture.progress = 100;
+			}
+		} catch (e) {
+			console.error('Recording failed:', e);
+			this.capture.error = e instanceof Error ? e.message : 'Recording failed.';
+		} finally {
+			this.pico.animation.setTime(savedAnimTime);
+			this.pico.animation.playing = savedAnimPlaying;
+			this.pico.transparency = savedTransparency;
+			this.pico.startRenderLoop();
+			this.pico.enableCameraControls();
+			this.capture.recording = false;
 		}
 	}
 
-	stopGIFRecording() {
+	stopRecording() {
 		this.recordingCancelled = true;
 	}
 
-	private computeSimulatedOffset(progress: number, cameraMode: CameraMode, direction: number) {
-		switch (cameraMode) {
-			case 'spin':
-				return progress * 2 * Math.PI * direction;
-			case 'sway':
-				return -direction * Math.sin(progress * 2 * Math.PI) * (Math.PI / 4);
-			case 'pingpong': {
-				let r = progress % 1;
-				if (r > 0.5) r = 1 - r;
-				return -direction * r * 2 * Math.PI;
-			}
-			case 'fixed':
-				return 0;
-		}
+	private createGifSink(
+		frameDuration: number,
+		background: number[],
+		transparentColor: [number, number, number]
+	): FrameSink {
+		const worker = this.worker!;
+		const width = this.pico.canvas.width;
+		const height = this.pico.canvas.height;
+
+		return {
+			addFrame: () => {
+				const pixelData = this.pico.toPixelData();
+				worker.postMessage({ type: 'frame', data: pixelData }, [pixelData.buffer]);
+			},
+			finish: () =>
+				new Promise<Blob>((resolve) => {
+					this.resolveGif = (data) => resolve(new Blob([data], { type: 'image/gif' }));
+					worker.postMessage({
+						type: 'generate',
+						width,
+						height,
+						frameDuration,
+						background,
+						transparentColor
+					});
+				}),
+			cancel: () => worker.postMessage({ type: 'reset' })
+		};
+	}
+
+	private async createVideoSink(
+		fps: number,
+		frameDuration: number,
+		background: number[]
+	): Promise<FrameSink> {
+		const width = this.pico.canvas.width & ~1;
+		const height = this.pico.canvas.height & ~1;
+
+		const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
+		const codec = await getFirstEncodableVideoCodec(output.format.getSupportedVideoCodecs(), {
+			width,
+			height,
+			frameRate: fps,
+			quality: QUALITY_VERY_HIGH
+		});
+		if (!codec) throw new Error(`This browser cannot encode a ${width}x${height} video.`);
+
+		const source = new VideoSampleSource({ codec, quality: QUALITY_VERY_HIGH });
+		output.addVideoTrack(source);
+		await output.start();
+
+		const frame = new OffscreenCanvas(width, height);
+		const ctx = frame.getContext('2d')!;
+		ctx.fillStyle = `rgb(${background[0]} ${background[1]} ${background[2]})`;
+
+		return {
+			addFrame: async (index) => {
+				ctx.fillRect(0, 0, width, height);
+				ctx.drawImage(this.pico.canvas, 0, 0);
+
+				const sample = new VideoSample(frame, {
+					timestamp: index * frameDuration,
+					duration: frameDuration
+				});
+				await source.add(sample);
+				sample.close();
+			},
+			finish: async () => {
+				await output.finalize();
+				return new Blob([output.target.buffer!], { type: 'video/mp4' });
+			},
+			cancel: () => output.cancel()
+		};
+	}
+
+	private download(blob: Blob, extension: string) {
+		if (this.capture.url) URL.revokeObjectURL(this.capture.url);
+		this.capture.url = URL.createObjectURL(blob);
+
+		const link = document.createElement('a');
+		const name = this.name ? this.name.replace(/\.[^/.]+$/, '') : 'model';
+		link.href = this.capture.url;
+		link.download = `${name}.${extension}`;
+		link.click();
+		link.remove();
 	}
 }
 

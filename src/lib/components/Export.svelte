@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { compressState, rgbToHex } from '../utils';
-	import { viewer } from '../viewer-state.svelte';
+	import { viewer, type CaptureFormat } from '../viewer-state.svelte';
+	import { CAPTURE_FPS_LIMITS } from '../constants';
 	import Dialog from '$lib/components/Dialog.svelte';
+
+	const formats = [
+		{ label: 'GIF', value: 'gif' },
+		{ label: 'Video (MP4)', value: 'video' }
+	] as const;
 
 	const resolutions = [
 		{ label: '2048x2048', value: 2048 },
@@ -43,6 +49,13 @@
 		navigator.clipboard.writeText(data);
 	}
 
+	const fpsLimits = $derived(CAPTURE_FPS_LIMITS[viewer.captureSettings.format]);
+
+	function clampFps(fps: number, format: CaptureFormat = viewer.captureSettings.format) {
+		const { min, max } = CAPTURE_FPS_LIMITS[format];
+		return Math.max(min, Math.min(max, Math.round(fps) || 30));
+	}
+
 	function toggleCustomResolution() {
 		viewer.update((pico) => {
 			if (viewer.usingCustomResolution) {
@@ -68,8 +81,40 @@
 
 <fieldset>
 	<legend>
-		<h4>Record Gif</h4>
+		<h4>Record</h4>
 	</legend>
+	<div class="grid capture">
+		<label>
+			Format
+			<select
+				disabled={viewer.capture.recording}
+				bind:value={
+					() => viewer.captureSettings.format,
+					(v) => {
+						viewer.captureSettings.format = v;
+						viewer.captureSettings.fps = clampFps(viewer.captureSettings.fps, v);
+					}
+				}
+			>
+				{#each formats as { label, value } (value)}
+					<option {value}>{label}</option>
+				{/each}
+			</select>
+		</label>
+		<label>
+			FPS
+			<input
+				class="no-margin"
+				type="number"
+				min={fpsLimits.min}
+				max={fpsLimits.max}
+				step="1"
+				disabled={viewer.capture.recording}
+				bind:value={viewer.captureSettings.fps}
+				onchange={() => (viewer.captureSettings.fps = clampFps(viewer.captureSettings.fps))}
+			/>
+		</label>
+	</div>
 	<label class="form-margin">
 		<input
 			type="checkbox"
@@ -155,11 +200,14 @@
 		</label>
 		<button
 			class={{ 'custom-resolution': viewer.usingCustomResolution, record: true }}
-			onclick={() => viewer.startGIFRecording()}
-			disabled={viewer.gif.recording}
-			type="submit">{viewer.gif.recording ? `${viewer.gif.progress}%` : 'Start'}</button
+			onclick={() => viewer.startRecording()}
+			disabled={viewer.capture.recording}
+			type="submit">{viewer.capture.recording ? `${viewer.capture.progress}%` : 'Start'}</button
 		>
 	</div>
+	{#if viewer.capture.error}
+		<p class="error">{viewer.capture.error}</p>
+	{/if}
 	{#if viewer.settings.resolution.width >= 512}
 		<p class="error record-error">
 			Recording at resolutions at or above 512x512 may cause performance issues, crashes, or
@@ -226,6 +274,15 @@
 <style>
 	.grid.gif {
 		grid-template-rows: auto auto;
+
+		select,
+		label {
+			margin-bottom: 0;
+		}
+	}
+
+	.grid.capture {
+		margin-bottom: var(--pico-spacing);
 
 		select,
 		label {

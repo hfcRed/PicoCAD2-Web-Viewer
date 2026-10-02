@@ -7,15 +7,31 @@ addEventListener('message', (event) => {
 
 	if (data.type === 'frame') {
 		frames.push(data.data);
+	} else if (data.type === 'reset') {
+		frames.length = 0;
 	} else if (data.type === 'generate') {
-		generateAndReset(data.width, data.height, data.delay, data.background, data.transparentColor);
+		generateAndReset(
+			data.width,
+			data.height,
+			data.frameDuration,
+			data.background,
+			data.transparentColor
+		);
 	}
 });
+
+// GIF is the dumbest standard ever created it's genuinely dogshit
+// GIF delays are in centiseconds so we can't just round every frame or it drifts
+function frameDelay(index: number, frameDuration: number) {
+	const start = Math.round(index * frameDuration * 100);
+	const end = Math.round((index + 1) * frameDuration * 100);
+	return (end - start) * 10;
+}
 
 function generateAndReset(
 	width: number,
 	height: number,
-	delay: number,
+	frameDuration: number,
 	background: number[],
 	transparentColor: [number, number, number]
 ) {
@@ -48,7 +64,7 @@ function generateAndReset(
 
 		encoder.writeFrame(indices, width, height, {
 			palette,
-			delay,
+			delay: frameDelay(i, frameDuration),
 			transparent: isTransparent,
 			transparentIndex
 		});
