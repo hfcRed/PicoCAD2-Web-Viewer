@@ -18,7 +18,7 @@ import {
 	BufferTarget,
 	Mp4OutputFormat,
 	Output,
-	QUALITY_VERY_HIGH,
+	Quality,
 	VideoSample,
 	VideoSampleSource,
 	getFirstEncodableVideoCodec
@@ -519,16 +519,17 @@ class Viewer {
 		const width = this.pico.canvas.width & ~1;
 		const height = this.pico.canvas.height & ~1;
 
+		const quality = new Quality('very-high');
 		const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
 		const codec = await getFirstEncodableVideoCodec(output.format.getSupportedVideoCodecs(), {
 			width,
 			height,
 			frameRate: fps,
-			quality: QUALITY_VERY_HIGH
+			quality
 		});
 		if (!codec) throw new Error(`This browser cannot encode a ${width}x${height} video.`);
 
-		const source = new VideoSampleSource({ codec, quality: QUALITY_VERY_HIGH });
+		const source = new VideoSampleSource({ codec, quality });
 		output.addVideoTrack(source);
 		await output.start();
 
